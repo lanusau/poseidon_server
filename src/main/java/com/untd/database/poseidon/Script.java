@@ -13,7 +13,6 @@ import java.util.ArrayList;
  */
 public class Script {
 	
-	// Constants
 	/**
 	 * Low severity
 	 */
@@ -50,7 +49,6 @@ public class Script {
 	public static final int MESSAGE_FORMAT_HTML = 1;
 	
 		
-	// Private variables
 	private int script_id;
 	private String name;
 	private String description;
@@ -283,112 +281,144 @@ public class Script {
 	}
 
 	/**
-	 * @return Returns the create_sysdate.
+	 * Get create_sysdate field
+	 * 
+	 * @return create_sysdate.
 	 */
 	public Timestamp getCreate_sysdate() {
 		return create_sysdate;
 	}
 
 	/**
-	 * @return Returns the description.
+	 * Get description field
+	 * 
+	 * @return description.
 	 */
 	public String getDescription() {
 		return description;
 	}
 
 	/**
-	 * @return Returns the expression_text.
+	 * Get expression text field
+	 * 
+	 * @return expression_text.
 	 */
 	public String getExpression_text() {
 		return expression_text;
 	}
 
 	/**
-	 * @return Returns the fixed_severity.
+	 * Get fixed_severity flag
+	 * 
+	 * @return fixed_severity flag
 	 */
 	public short getFixed_severity() {
 		return fixed_severity;
 	}
 
 	/**
-	 * @return Returns the message_header.
+	 * Get message_header field
+	 * 
+	 * @return message_header.
 	 */
 	public String getMessage_header() {
 		return message_header;
 	}
 
 	/**
-	 * @return Returns the message_subject.
+	 * Get message_subject field
+	 * 
+	 * @return message_subject.
 	 */
 	public String getMessage_subject() {
 		return message_subject;
 	}
 
 	/**
-	 * @return Returns the message_text.
+	 * Get message_text field
+	 * 
+	 * @return message_text.
 	 */
 	public String getMessage_text() {
 		return message_text_str;
 	}
 
 	/**
-	 * @return Returns the name.
+	 * Get script name
+	 * 
+	 * @return script name.
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return Returns the query_text.
+	 * Get query_text field
+	 * 
+	 * @return query_text.
 	 */
 	public String getQuery_text() {
 		return query_text;
 	}
 
 	/**
-	 * @return Returns the query_type.
+	 * Get query_type field
+	 * 
+	 * @return query_type.
 	 */
 	public int getQuery_type() {
 		return query_type;
 	}
 
 	/**
-	 * @return Returns the schedule_day.
+	 * Get schedule_day field
+	 * 
+	 * @return schedule_day.
 	 */
 	public String getSchedule_day() {
 		return schedule_day;
 	}
 
 	/**
-	 * @return Returns the schedule_hour.
+	 * Get schedule_hour field
+	 * 
+	 * @return schedule_hour.
 	 */
 	public String getSchedule_hour() {
 		return schedule_hour;
 	}
 
 	/**
-	 * @return Returns the schedule_min.
+	 * Get schedule_min field
+	 * 
+	 * @return schedule_min.
 	 */
 	public String getSchedule_min() {
 		return schedule_min;
 	}
 
 	/**
-	 * @return Returns the schedule_month.
+	 * Get schedule_month field
+	 * 
+	 * @return schedule_month.
 	 */
 	public String getSchedule_month() {
 		return schedule_month;
 	}
 
 	/**
-	 * @return Returns the schedule_week.
+	 * Get schedule_week field
+	 * 
+	 * @return schedule_week.
 	 */
 	public String getSchedule_week() {
 		return schedule_week;
 	}
 	
 	/**
-	 * @return Returns full schedule
+	 * Get full schedule string
+	 * 
+	 * @return full schedule script
 	 */
 	public String getFullSchedule() {
 		return 
@@ -401,14 +431,18 @@ public class Script {
 	}
 
 	/**
-	 * @return Returns the script_id.
+	 * Get script_id field
+	 * 
+	 * @return script_id.
 	 */
 	public int getScript_id() {
 		return script_id;
 	}
 
 	/**
-	 * @return Returns the severity_column_position.
+	 * Get severity_column_position field
+	 * 
+	 * @return severity_column_position.
 	 */
 	public int getSeverity_column_position() {
 		if (severity_column_position != -1) {
@@ -419,35 +453,45 @@ public class Script {
 	}
 
 	/**
-	 * @return Returns the status_code.
+	 * Get status_code field
+	 * 
+	 * @return status_code.
 	 */
 	public String getStatus_code() {
 		return status_code;
 	}
 
 	/**
-	 * @return Returns the update_sysdate.
+	 * Get update_sysdate field
+	 * 
+	 * @return update_sysdate.
 	 */
 	public Timestamp getUpdate_sysdate() {
 		return update_sysdate;
 	}
 
 	/**
-	 * @return Returns the value_high_severity.
+	 * Get value_high_severity field
+	 * 
+	 * @return value_high_severity.
 	 */
 	public int getValue_high_severity() {
 		return value_high_severity;
 	}
 
 	/**
-	 * @return Returns the value_med_severity.
+	 * Get value_med_severity field
+	 * 
+	 * @return value_med_severity.
 	 */
 	public int getValue_med_severity() {
 		return value_med_severity;
 	}
 
 	/**
-	 * @return Returns the targets.
+	 * Get a list of targets assigned to this script
+	 * 
+	 * @return List of {@link Target} objects
 	 */
 	public ArrayList<Target> getTargets() {
 		return targets;
@@ -455,6 +499,7 @@ public class Script {
 	
 	/**
 	 * Get message format
+	 * 
 	 * @return message_format
 	 */
 	public int getMessage_format() {
@@ -463,6 +508,7 @@ public class Script {
 
 	/**
 	 * Get message footer
+	 * 
 	 * @return message_footer
 	 */
 	public String getMessage_footer() {
@@ -472,10 +518,11 @@ public class Script {
 	
 	/**
 	 * 
-	 * Return a list of targets that script runs on, filtered by our server id
+	 * Return a list of targets that script runs on, 
+	 * filtered by our server id
 	 * 
 	 * @param serverId our server id
-	 * @return list of targets
+	 * @return list of {@link Target} objects
 	 */
 	public ArrayList<Target> getTargets(int serverId) {	
 		
@@ -491,7 +538,7 @@ public class Script {
 
 	/**
 	 * Return notification list for particular severity
-	 * @return Returns the notificationList.
+	 * @return list of {@link Notification} objects
 	 */
 	public ArrayList<Notification> getNotificationList(short severity) {
 		
@@ -556,11 +603,14 @@ public class Script {
 		return severity;
 	}
 	/**
-	 * @return Returns whether error has occurred
+	 * Returns whether error has occurred
+	 * 
+	 * @return true or false 
 	 */
 	public boolean hasErrorOccured() {
 		return errorOccured;
 	}
+	
 	/**
 	 * Set error flag
 	 * @param errorOccured error flag
@@ -568,6 +618,7 @@ public class Script {
 	public void setErrorOccured(boolean errorOccured) {
 		this.errorOccured = errorOccured;
 	}
+	
 	/**
 	 * Return triggered flag
 	 * @return true of false
@@ -575,6 +626,7 @@ public class Script {
 	public boolean isTriggered() {
 		return triggered;
 	}
+	
 	/**
 	 * Set triggered flag
 	 * @param triggered triggered flag
@@ -582,6 +634,7 @@ public class Script {
 	public void setTriggered(boolean triggered) {
 		this.triggered = triggered;
 	}
+	
 	/**
 	 * Return execution severity
 	 * @return execution severity
@@ -589,13 +642,15 @@ public class Script {
 	public short getExecutionSeverity() {
 		return executionSeverity;
 	}
+	
 	/**
 	 * Set execution severity
 	 * @param executionSeverity execution severity
-	 */
+	 */	
 	public void setExecutionSeverity(short executionSeverity) {
 		this.executionSeverity = executionSeverity;
 	}
+	
 	/**
 	 * @return the timeout_sec
 	 */

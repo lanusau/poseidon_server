@@ -28,7 +28,6 @@ public class ControlDataStore {
 	 * @param paramJdbcURL JDBC URL for control database
 	 * @param paramUsername username for control database 
 	 * @param paramPassword password for control database
-	 * @param prop properties
 	 * @throws SQLException
 	 */
 	public static void init(

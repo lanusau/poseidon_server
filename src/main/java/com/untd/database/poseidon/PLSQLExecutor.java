@@ -15,7 +15,7 @@ public class PLSQLExecutor extends Executor {
 	OracleCallableStatement  st;
 	
 	/**
-	 * @see untd.database.poseidon.Executor#execute(java.sql.Connection, untd.database.poseidon.Script, untd.database.poseidon.ExecutionResult)
+	 * Execute PL/SQL call
 	 */
 	public void execute(Connection conn, Script script,
 			ExecutionResult executionResult) throws SQLException {	

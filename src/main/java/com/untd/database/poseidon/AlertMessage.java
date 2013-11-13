@@ -49,7 +49,7 @@ public class AlertMessage {
 	}
 	
 	/**
-	 * Add a row to a message text
+	 * Add a row to a message text. 
 	 * The row is constructed using template in the script and columns in
 	 * provided row from execution result
 	 * @param row row from execution result 
@@ -92,14 +92,18 @@ public class AlertMessage {
 	}
 
 	/**
-	 * @return Return message subject 
+	 * Return message subject
+	 * 
+	 * @return message subject 
 	 */
 	public String getMessageSubject() {
 		return messageSubject.replaceAll("%s",severityTxt);
 	}
 	
 	/**
-	 * @return Return message text
+	 * Return message text
+	 * 
+	 * @return message text
 	 */
 	public String getMessageText() {
 		StringBuilder messageText;
@@ -113,6 +117,7 @@ public class AlertMessage {
 	
 	/**
 	 * Return message format
+	 * 
 	 * @return messageFormat
 	 */
 	public int getMessageFormat() {

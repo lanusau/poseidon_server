@@ -31,6 +31,8 @@ public class PoseidonJob implements StatefulJob {
 		int scriptLogId,scriptId=0;
 		long jobStartTime,jobEndTime;
 		
+		int maxThreadRunTimeSec = PoseidonConfiguration.getConfiguration().getInt("maxThreadRunTimeSec");
+		
 		try {
 			// Get data passed to the job and extract script ID
 			JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
@@ -57,7 +59,7 @@ public class PoseidonJob implements StatefulJob {
 			// Wait until all jobs finish or until timer expires
 			threadsRunning = true;
 			jobEndTime = System.currentTimeMillis();
-			while (threadsRunning && ((jobEndTime-jobStartTime) < PoseidonServer.maxThreadRunTimeSec * 1000)) {
+			while (threadsRunning && ((jobEndTime-jobStartTime) < maxThreadRunTimeSec * 1000)) {
 								
 				threadsRunning = false;
 								
@@ -79,7 +81,7 @@ public class PoseidonJob implements StatefulJob {
 			// If timer expired, log the timeout and exit
 			// There is no easy way to cleanup zombie threads, because they are most
 			// probably hanging on the system network call. So we just leave them running
-			if ((jobEndTime-jobStartTime) > PoseidonServer.maxThreadRunTimeSec * 1000) {
+			if ((jobEndTime-jobStartTime) > maxThreadRunTimeSec * 1000) {
 				
 				ControlDataStore.logScriptTimeout(script,scriptLogId);
 				

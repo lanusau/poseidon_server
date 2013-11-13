@@ -15,12 +15,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
- * Main class for the Poseidon server. 
+ * This is the main class for the Poseidon monitoring server. 
  * 
- * This is the main class for the Poseidon monitoring server that does the work
- * of parsing parameters, creating database connection to the control database 
- * and scheduling monitoring scripts. 
- *
  */
 public class PoseidonServer {
 	
@@ -34,8 +30,6 @@ public class PoseidonServer {
 	 * Server ID, obtained from the property file
 	 */
 	static public int serverId;	
-	static public String decryptionSecret;
-	volatile static int maxThreadRunTimeSec;
 
 	/**
 	 * 
@@ -72,8 +66,6 @@ public class PoseidonServer {
 		assertMandatoryProperty("password");
 						
 		serverId = prop.getInt("serverId");	
-		decryptionSecret = prop.getString("decryptionSecret");
-		maxThreadRunTimeSec = prop.getInt("maxThreadRunTimeSec");
 		jdbcURL = prop.getString("controlConnectionDescription");
 		username = prop.getString("username");
 		password = prop.getString("password");		
@@ -236,7 +228,7 @@ public class PoseidonServer {
 	 * 
 	 * @param propertyName
 	 */
-	static void assertMandatoryProperty(String propertyName) {
+	private static void assertMandatoryProperty(String propertyName) {
 		if (prop.getString(propertyName) == null) {
 			logger.error("Mandatory property "+propertyName+" is not set");
 			System.exit(1);

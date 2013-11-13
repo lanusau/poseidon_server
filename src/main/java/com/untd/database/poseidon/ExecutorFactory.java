@@ -1,7 +1,7 @@
 package com.untd.database.poseidon;
 
 /**
- * Class to return correct Executor for Script. Current, 2 types of executors are provided 
+ * Class to return correct Executor for Script. Current, 2 types of executors are provided: 
  * SQL and PL/SQL
  *
  */

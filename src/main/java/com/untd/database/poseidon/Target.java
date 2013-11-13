@@ -87,70 +87,89 @@ public class Target {
 	}
 
 	/**
-	 * @return Returns the database_name.
+	 * Returns the database_name
+	 * 
+	 * @return database name
 	 */
 	public String getDatabase_name() {
 		return database_name;
 	}
 
 	/**
-	 * @return Returns the hostname.
+	 * Returns the host name
+	 * 
+	 * @return host name
 	 */
 	public String getHostname() {
 		return hostname;
 	}
 
 	/**
-	 * @return Returns the monitor_password.
+	 * Returns the monitor_password
+	 * 
+	 * @return monitor_password
 	 */
 	public String getMonitor_password() {
 		return monitor_password;
 	}
 
 	/**
-	 * @return Returns the monitor_username.
+	 * Returns the monitor_username
+	 * 
+	 * @return monitor_username
 	 */
 	public String getMonitor_username() {
 		return monitor_username;
 	}
 
 	/**
-	 * @return Returns the name.
+	 * Returns the target name
+	 * 
+	 * @return target name
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return Returns the port_number.
+	 * Returns the port number
+	 * 
+	 * @return port number
 	 */
 	public int getPort_number() {
 		return port_number;
 	}
 
 	/**
-	 * @return Returns the status_code.
+	 * Returns the status code
+	 * 
+	 * @return status code 
 	 */
 	public String getStatus_code() {
 		return status_code;
 	}
 
 	/**
-	 * @return Returns the url.
+	 * Returns connection URL for the target
+	 * @return connection URL
 	 */
 	public String getUrl() {
 		return url;
 	}
 
 	/**
-	 * @return Returns the target_id.
+	 * Returns the target id
+	 * 
+	 * @return target id
 	 */
 	public int getTarget_id() {
 		return target_id;
 	}
 	
 	/**
-	 * @return Returns whether error has occurred
+	 * Returns whether error has occurred
+	 * 
+	 * @return true or false 
 	 */
 	public boolean hasErrorOccured() {
 		return errorOccured;
@@ -158,14 +177,15 @@ public class Target {
 
 	/**
 	 * Set flag whether error has occurred
-	 * @param errorOccured - flag
+	 * @param errorOccured true or false
 	 */
 	public void setErrorOccured(boolean errorOccured) {
 		this.errorOccured = errorOccured;
 	}
 
 	/**
-	 * @return the server_id
+	 * Return server id assigned to this target 
+	 * @return server id
 	 */
 	public int getServer_id() {
 		return server_id;

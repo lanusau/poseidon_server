@@ -26,8 +26,8 @@ public class SqlText {
 	/**
 	 * Get text of particular SQL statement
 	 * 
-	 * @param key - key of the SQL statement
-	 * @return - SQL statement text
+	 * @param key key of the SQL statement
+	 * @return SQL statement text
 	 * @throws ConfigurationException
 	 */
 	public static String getString(String key) {

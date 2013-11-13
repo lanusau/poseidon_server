@@ -9,8 +9,8 @@ public class Notification {
 	private String emailAddress;
 	
 	/**
-	 * @param paramSeverity
-	 * @param paramEmailAddress
+	 * @param paramSeverity severity level
+	 * @param paramEmailAddress email address
 	 */
 	public Notification(short paramSeverity,String paramEmailAddress) {
 		severity = paramSeverity;
@@ -18,13 +18,17 @@ public class Notification {
 	}
 
 	/**
-	 * @return Returns the emailAddress.
+	 * Get email address
+	 * 
+	 * @return email address.
 	 */
 	public String getEmailAddress() {
 		return emailAddress;
 	}
 
 	/**
+	 * Set email address
+	 * 
 	 * @param emailAddress The emailAddress to set.
 	 */
 	public void setEmailAddress(String emailAddress) {
@@ -32,13 +36,17 @@ public class Notification {
 	}
 
 	/**
-	 * @return Returns the severity.
+	 * Get severity
+	 * 
+	 * @return severity.
 	 */
 	public short getSeverity() {
 		return severity;
 	}
 
 	/**
+	 * Set severity
+	 * 
 	 * @param severity The severity to set.
 	 */
 	public void setSeverity(short severity) {

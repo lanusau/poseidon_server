@@ -28,7 +28,7 @@ public class Alerter {
 	 * 
 	 * Initialize alerter.
 	 * 
-	 * @param prop Properties object, expected to contain property for "smtpHostName"
+	 * @param prop Configuration object, expected to contain property for "smtpHostName"
 	 */
 	public static void init(Configuration prop) {
 		
@@ -56,8 +56,7 @@ public class Alerter {
 	 * Send email to specified email addresses
 	 * 
 	 * @param emailAddresses List of email addresses
-	 * @param emailSubject Email subject
-	 * @param emailText Email text
+	 * @param alertMessage AlertMessage object
 	 */
 	synchronized public static void alert(ArrayList<String> emailAddresses,AlertMessage alertMessage) {
 				

@@ -5,6 +5,10 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+/**
+ * Static class to keep configuration information
+ *
+ */
 public class PoseidonConfiguration {
 	
 	private static CompositeConfiguration prop; 
