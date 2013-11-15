@@ -73,7 +73,7 @@ public class PoseidonServer {
 		logger.info("Starting server ID:"+serverId);
 						
 		// Initialize Alerter
-		Alerter.init(prop);
+		Alerter.init();
 		
 		// Initialize ControlDataStore
 		try {

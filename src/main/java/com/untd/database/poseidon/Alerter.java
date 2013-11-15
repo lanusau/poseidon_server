@@ -12,6 +12,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,22 +29,21 @@ public class Alerter {
 	 * 
 	 * Initialize alerter.
 	 * 
-	 * @param prop Configuration object, expected to contain property for "smtpHostName"
 	 */
-	public static void init(Configuration prop) {
+	public static void init() {
+		
+		Configuration prop = PoseidonConfiguration.getConfiguration();
 		
 		// Initialize logger	
-		logger = LoggerFactory.getLogger(Alerter.class);
+		logger = LoggerFactory.getLogger(Alerter.class);		
 		
-		String smtpHostName;
-		
-		if (prop.getString("smtpHostName") == null) {
-			logger.warn("smtpHostName parameter not found, using default server: smtp");
+		if (prop.getString("mail.smtp.host") == null) {
+			logger.warn("mail.smtp.host parameter not found, using default server: smtp");
+			prop.addProperty("mail.smtp.host", "snmp");
 		}
-		
-		smtpHostName = prop.getString("smtpHostName");
-		Properties sessionProps = new Properties();
-		sessionProps.put("mail.smtp.host",smtpHostName );
+			
+		Properties sessionProps = ConfigurationConverter.getProperties(prop);
+			
 		mailSession = Session.getInstance(sessionProps, null);
 		if (prop.getString("fromEmailAddress") == null) {
 			logger.warn("fromEmailAddress parameter not found, using default: dba_team@localhost");

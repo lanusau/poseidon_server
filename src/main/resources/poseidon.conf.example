@@ -5,7 +5,7 @@ password=***
 serverId=ID of the server from Poseidon UI or psd_server table
 
 # Email configuration
-smtpHostName=smtp
+mail.smtp.host=smtp
 fromEmailAddress=monitoring-database@host.com
 
 # Secret to decrypt target passwords. 

@@ -1,11 +1,14 @@
 # Poseidon Server
 
-Poseidon Server is java application that can run and evaluate custom monitoring scripts agains Oracle, Mysql and PostgreSQL databases. The repository database can be managed using Poseidon UI application. 
+Poseidon Server is java application that can run and 
+evaluate custom monitoring scripts agains Oracle, Mysql and 
+PostgreSQL databases. The repository database can 
+be managed using Poseidon UI application. 
 
 ## Requirements 
 
 * Linux x86_64
-* JRE 1.6
+* JRE 1.6/7
 
 ## Setup
 
@@ -14,15 +17,10 @@ Poseidon Server is java application that can run and evaluate custom monitoring 
 Install and setup Poseidon UI application, which will setup repository
 database. 
 
-### Download the application
-
-Download application from github:
-
-	git clone https://github.com/lanusau/poseidon_server.git
+### Download and extract the software
 
 ### Setup database user to access repository database. 
 
-	create database <db_name>;
 	grant select,insert,update,delete on <db_name>.* 
 	to <app_user>@'%' identified by '***';
 
