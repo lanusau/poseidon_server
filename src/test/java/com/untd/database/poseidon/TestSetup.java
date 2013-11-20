@@ -13,6 +13,7 @@ public class TestSetup {
 	public static Connection connection;
 	public static int script_id;
 	public static int target_id;
+	public static int server_id;
 	
 	public static void setup() throws SQLException, ConfigurationException {
 		
@@ -27,7 +28,7 @@ public class TestSetup {
 				PoseidonConfiguration.getConfiguration().getString("controlConnectionDescription"),
 				PoseidonConfiguration.getConfiguration().getString("username"),
 				PoseidonConfiguration.getConfiguration().getString("password"));		
-		connection.setAutoCommit(false);
+		connection.setAutoCommit(true);
 		
 		// Find test script ID by name
 		String sql = "select script_id from psd_script where name = 'Dataguard check'";
@@ -39,12 +40,13 @@ public class TestSetup {
 			script_id = 0;
 		}
 		
-		// Get test target ID by name
-		sql = "select target_id from psd_target where name = 'oracle@target1.com'";
+		// Get test target ID by name. Also get server ID
+		sql = "select target_id, server_id from psd_target where name = 'oracle@target1.com'";
 		st = connection.prepareCall(sql);
 		rs = st.executeQuery();
 		if (rs.next()) {
 			target_id = rs.getInt(1);
+			server_id = rs.getInt(2);
 		} else {
 			target_id = 0;
 		} 

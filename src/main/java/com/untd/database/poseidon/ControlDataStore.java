@@ -40,7 +40,7 @@ public class ControlDataStore {
 		password = paramPassword;
 		
 
-		maxConnectionRetryCount = PoseidonConfiguration.getConfiguration().getInt("maxConnectionRetryCount");
+		maxConnectionRetryCount = PoseidonConfiguration.getConfiguration().getInt("maxConnectionRetryCount",5);
 		
 		connect();
 	}
