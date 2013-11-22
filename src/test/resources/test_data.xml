@@ -305,6 +305,33 @@ and ml.max_seq != appl_l.max_applied_seq
       <value><![CDATA[2006-10-10 09:49:12.0]]></value>
       <value><![CDATA[2010-04-07 04:47:32.0]]></value>
     </row>
+    <row>
+      <value>1055130494</value>
+      <value>ScriptForJUnit</value>
+      <value><![CDATA[test poseidon server (java program)]]></value>
+      <value>0/1</value>
+      <value>*</value>
+      <value>*</value>
+      <value>*</value>
+      <value>?</value>
+      <value>1</value>
+      <value><![CDATA[select count(*) from psd_target
+]]></value>
+      <value>300</value>
+      <value>1</value>
+      <null/>
+      <null/>
+      <null/>
+      <value><![CDATA[%0 > 1]]></value>
+      <value>0</value>
+      <value><![CDATA[[%t] Test]]></value>
+      <null/>
+      <value><![CDATA[Testing 123 ]]></value>
+      <null/>
+      <value>A</value>
+      <value><![CDATA[2006-10-10 09:49:12.0]]></value>
+      <value><![CDATA[2010-04-07 04:47:32.0]]></value>
+    </row>
   </table>
   <table name="psd_script_category">
     <column>script_category_id</column>
@@ -365,24 +392,24 @@ and ml.max_seq != appl_l.max_applied_seq
     <row>
       <value>367322802</value>
       <value>865484027</value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
       <value>2</value>
       <value>0</value>
       <value>1</value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
     </row>
     <row>
       <value>1044572710</value>
       <value>865484027</value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
       <value>2</value>
       <value>1</value>
       <value>0</value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
-      <value><![CDATA[2013-04-12 02:22:55.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
+      <value><![CDATA[2013-11-21 02:30:28.0]]></value>
     </row>
   </table>
   <table name="psd_script_notification">
@@ -391,6 +418,13 @@ and ml.max_seq != appl_l.max_applied_seq
     <column>script_id</column>
     <column>create_sysdate</column>
     <column>update_sysdate</column>
+    <row>
+      <value>298486374</value>
+      <value>501342728</value>
+      <value>1055130494</value>
+      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
+      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
+    </row>
     <row>
       <value>980190962</value>
       <value>501342728</value>
@@ -419,6 +453,13 @@ and ml.max_seq != appl_l.max_applied_seq
     <column>script_id</column>
     <column>create_sysdate</column>
     <column>update_sysdate</column>
+    <row>
+      <value>113629430</value>
+      <value>656381139</value>
+      <value>1055130494</value>
+      <value><![CDATA[2006-10-10 09:49:12.0]]></value>
+      <value><![CDATA[2010-04-07 04:47:32.0]]></value>
+    </row>
     <row>
       <value>298486374</value>
       <value>297150677</value>
@@ -589,6 +630,22 @@ and ml.max_seq != appl_l.max_applied_seq
       <value>4969826170212300</value>
       <value>Pk6GNLh9XEDlbcz8SYY07g==\n</value>
       <value>I</value>
+      <value><![CDATA[2020-01-01 17:00:00.0]]></value>
+      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
+      <value><![CDATA[2012-07-30 07:39:56.0]]></value>
+    </row>
+    <row>
+      <value>656381139</value>
+      <value>354424892</value>
+      <value>334344675</value>
+      <value>TargetForJUnit</value>
+      <value>SetByJunit</value>
+      <value>SetByJunit</value>
+      <value>3306</value>
+      <value>poseidon3_test</value>
+      <value>3802852479467620</value>
+      <value>wFgBkMJ5nkgSJOtVJo1r7g==</value>
+      <value>A</value>
       <value><![CDATA[2020-01-01 17:00:00.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-30 07:39:56.0]]></value>

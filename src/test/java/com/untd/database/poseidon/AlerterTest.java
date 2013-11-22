@@ -37,6 +37,8 @@ public class AlerterTest {
 		Alerter.alert(emailAddresses, alertMessage);
 		assertEquals(1, fakeMailServer.getReceivedMessages().length);
 		
+		fakeMailServer.stop();
+		
 		TestSetup.done();
 	}
 

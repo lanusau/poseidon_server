@@ -31,7 +31,7 @@ public class PoseidonJob implements StatefulJob {
 		int scriptLogId,scriptId=0;
 		long jobStartTime,jobEndTime;
 		
-		int maxThreadRunTimeSec = PoseidonConfiguration.getConfiguration().getInt("maxThreadRunTimeSec");
+		int maxThreadRunTimeSec = PoseidonConfiguration.getConfiguration().getInt("maxThreadRunTimeSec",600);
 		
 		try {
 			// Get data passed to the job and extract script ID

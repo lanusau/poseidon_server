@@ -11,6 +11,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  */
 public class PoseidonConfiguration {
 	
+	public static boolean initialized = false;
+	
 	private static CompositeConfiguration prop; 
 	
 	/**
@@ -20,6 +22,7 @@ public class PoseidonConfiguration {
 	 */
 	public static void init()  {		
 		prop = new CompositeConfiguration();
+		initialized = true;
 	}
 	
 	/**
@@ -40,5 +43,12 @@ public class PoseidonConfiguration {
 	 */
 	public static Configuration getConfiguration() {
 		return prop;
+	}
+	
+	/**
+	 * @return whether configuration was already initialized
+	 */
+	public static boolean isInitialized() {
+		return initialized;
 	}
 }

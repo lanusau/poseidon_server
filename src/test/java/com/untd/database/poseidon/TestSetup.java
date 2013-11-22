@@ -31,7 +31,7 @@ public class TestSetup {
 		connection.setAutoCommit(true);
 		
 		// Find test script ID by name
-		String sql = "select script_id from psd_script where name = 'Dataguard check'";
+		String sql = "select script_id from psd_script where name = 'ScriptForJUnit'";
 		PreparedStatement st = connection.prepareCall(sql);
 		ResultSet rs = st.executeQuery();
 		if (rs.next()) {
@@ -41,7 +41,7 @@ public class TestSetup {
 		}
 		
 		// Get test target ID by name. Also get server ID
-		sql = "select target_id, server_id from psd_target where name = 'oracle@target1.com'";
+		sql = "select target_id, server_id from psd_target where name = 'TargetForJUnit'";
 		st = connection.prepareCall(sql);
 		rs = st.executeQuery();
 		if (rs.next()) {

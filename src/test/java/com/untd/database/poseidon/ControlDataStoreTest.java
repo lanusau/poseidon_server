@@ -25,9 +25,9 @@ public class ControlDataStoreTest {
 		Script script = ControlDataStore.getScript(TestSetup.script_id);
 		assertNotNull(script);
 
-		// There should be 2 active and 1 inactive scripts
+		// There should be 3 active and 1 inactive scripts
 		ArrayList<Script> scriptList = ControlDataStore.getActiveScriptList(TestSetup.server_id);
-		assertTrue(scriptList.size() == 2);
+		assertTrue(scriptList.size() == 3);
 		scriptList = ControlDataStore.getInactiveScriptList(TestSetup.server_id);
 		assertTrue(scriptList.size() == 1);
 		

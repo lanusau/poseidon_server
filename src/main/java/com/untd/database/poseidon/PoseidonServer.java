@@ -29,14 +29,45 @@ public class PoseidonServer {
 	/**
 	 * Server ID, obtained from the property file
 	 */
-	static public int serverId;	
+	static public int serverId;
+	
+	/**
+	 *  Flag whether server is enabled
+	 */
+	static public volatile boolean enabled; 
 
 	/**
-	 * 
 	 * Main method for the PoseidonServer class.
-	 * 
 	 */
 	public static void main(String[] args) {		
+		init();
+		run();
+	}	
+	
+	/**
+	 * Initialize configuration
+	 */
+	private static void initConfiguration() {
+		// Configuration will be already initialized 
+		// in JUnit test
+		if (PoseidonConfiguration.isInitialized()) {
+			return;
+		}
+		try {
+			PoseidonConfiguration.init();
+			PoseidonConfiguration.addPropertyFile("poseidon-default.conf");
+			PoseidonConfiguration.addPropertyFile("poseidon.conf");
+			SqlText.init();
+		} catch (ConfigurationException e) {
+			logger.error("Error trying to load properties: " + e.getMessage());
+			System.exit(1);
+		}
+	}
+	
+	/**
+	 * Initialize server
+	 */
+	public static void init() {
 		
 		// Initialize logger	
 		logger = LoggerFactory.getLogger(PoseidonServer.class);
@@ -45,16 +76,8 @@ public class PoseidonServer {
 		java.security.Security.setProperty("networkaddress.cache.ttl" , "0");
 		java.security.Security.setProperty("networkaddress.cache.negative.ttl" , "0");				 					   									  
 		
-		// Setup configuration
-		try {			
-			PoseidonConfiguration.init();
-			PoseidonConfiguration.addPropertyFile("poseidon-default.conf");
-			PoseidonConfiguration.addPropertyFile("poseidon.conf");
-			SqlText.init();
-		} catch (ConfigurationException e) {
-			logger.error("Error trying to load properties: "+ e.getMessage());
-			System.exit(1);
-		}				
+		// Initialize configuration
+		initConfiguration();				
 		
 		prop = PoseidonConfiguration.getConfiguration();
 		
@@ -100,9 +123,19 @@ public class PoseidonServer {
 			return;
 		}
 		
+		enabled = true;
+	}
+	
+	
+	/**
+	 * Run the server. 
+	 */
+	public static void run () {
 		
-		// Loop forever until process is killed
-		while(true) {
+		
+		// Loop while enabled flag is set, which pretty much means
+		// until killed, because enabled flag is only reset in testing. 
+		while(enabled) {
 			try {
 				
 				// Get a list of active scripts and add them to the schedule				
@@ -118,7 +151,7 @@ public class PoseidonServer {
 				// Send heart beat to the server table
 				ControlDataStore.logHeartbeat(serverId);
 				
-				Thread.sleep(prop.getInt("mainThreadSleepSec*1000"));
+				Thread.sleep(prop.getInt("mainThreadSleepSec",5)*1000);
 																				
 
 			} catch (Exception e) {
@@ -126,7 +159,19 @@ public class PoseidonServer {
 				logger.error(e.getMessage());
 			}
 		}
-
+		
+		try {
+			sched.shutdown();
+		} catch (SchedulerException e) {
+			// Do nothing, we are shutting down
+		}
+	}
+	
+	/**
+	 * Stop Poseidon server. This is used in testing only
+	 */
+	public static void disable() {
+		enabled = false;
 	}
 	
 	/**
@@ -148,6 +193,8 @@ public class PoseidonServer {
 				// Script already exists, check if it has been updated
 				jobData = jobDetail.getJobDataMap();
 				if (jobData.getLong("update_sysdate") != script.getUpdate_sysdate().getTime()) {
+					logger.debug("Job timestamp:"+jobData.getLong("update_sysdate"));
+					logger.debug("Script timestamp:"+script.getUpdate_sysdate().getTime());
 					// Script was updated, we need to change trigger schedule
 					logger.info("Rescheduling script:"+script.getName());
 					
@@ -166,7 +213,7 @@ public class PoseidonServer {
 				}
 			} else {	
 				// No job for this script yet, create new one
-				logger.info("Scheduling script:"+script.getName());
+				logger.info("Scheduling script:"+script.getName()+" using schedule ["+script.getFullSchedule()+"]");
 				
 				jobDetail = new JobDetail(script.getScript_id()+"",
 						Scheduler.DEFAULT_GROUP,
@@ -234,5 +281,6 @@ public class PoseidonServer {
 			System.exit(1);
 		}
 	}
+		
 	
 }
