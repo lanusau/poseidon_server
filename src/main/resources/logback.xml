@@ -14,7 +14,7 @@
     <!-- Support multiple-JVM writing to the same log file -->
     <prudent>true</prudent>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>../logs/replication.log.%d{yyyyMMdd}</fileNamePattern>
+      <fileNamePattern>../logs/poseidon.log.%d{yyyyMMdd}</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
 
@@ -28,6 +28,8 @@
 
   <!-- Logging levels for Apache libraries -->
   <logger name="org.apache.commons.configuration" level="ERROR"/>
+  <!-- Logging levels for Quartz libraries -->
+  <logger name="org.quartz" level="WARN"/>
 
   <!-- Strictly speaking, the level attribute is not necessary since -->
   <!-- the level of the root level is set to DEBUG by default.       -->

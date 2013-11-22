@@ -58,7 +58,7 @@ public class PoseidonServerTest {
 				
 		// Update script schedule to start in 1 minutes				
 		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.MINUTE, 2);
+		calendar.add(Calendar.MINUTE, 1);
 		// Add 10 second just in case we are close to next minute
 		calendar.add(Calendar.SECOND, 10);
 
