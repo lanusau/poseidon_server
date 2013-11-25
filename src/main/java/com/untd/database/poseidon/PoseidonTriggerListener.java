@@ -2,6 +2,8 @@ package com.untd.database.poseidon;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
+import org.quartz.Trigger.CompletedExecutionInstruction;
+import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.slf4j.LoggerFactory;
 
@@ -27,28 +29,32 @@ public class PoseidonTriggerListener implements TriggerListener {
 	}
 
 	/** 
-	 * Log the fact that some script missfired
+	 * Log the fact that some script misfired
 	 * @see org.quartz.TriggerListener#triggerMisfired(org.quartz.Trigger)
 	 */
 	public void triggerMisfired(Trigger trigger) {
-		
-		String jobName = trigger.getJobName();
+				
+		TriggerKey triggerKey = trigger.getKey();
 		int scriptId;
 		
 		// Job name in Poseidon is the same as script ID
 		// Convert jobName to int
 		try {
-			scriptId = Integer.parseInt(jobName);
+			scriptId = Integer.parseInt(triggerKey.getName());
 			Script script = ControlDataStore.getScript(scriptId);
 			ControlDataStore.logScriptMissfire(script);
 			
 		} catch (Exception e){
-			LoggerFactory.getLogger(PoseidonTriggerListener.class).error("Invalid jobName/ScriptID:"+jobName);
+			LoggerFactory.getLogger(PoseidonTriggerListener.class).error("Invalid jobName/ScriptID:"+triggerKey.getName());
 		}
 		
 	}
 
-	public void triggerComplete(Trigger arg0, JobExecutionContext arg1, int arg2) {
+	@Override
+	public void triggerComplete(Trigger arg0, JobExecutionContext arg1,
+			CompletedExecutionInstruction arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -24,7 +24,7 @@
     <dependency>
     	<groupId>org.quartz-scheduler</groupId>
     	<artifactId>quartz</artifactId>
-    	<version>1.8.6</version>
+    	<version>2.2.1</version>
     </dependency>
     <dependency>
     	<groupId>org.postgresql</groupId>
@@ -84,6 +84,16 @@
   	<url>http://untd.com</url>
   </organization>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>poseidon-default.conf</include>
+          <include>sqltext.properties</include>
+          <include>quartz.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

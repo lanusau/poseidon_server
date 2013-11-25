@@ -1,15 +1,23 @@
 package com.untd.database.poseidon;
 
+import static org.quartz.JobKey.*;
+import static org.quartz.TriggerKey.*;
+import static org.quartz.TriggerBuilder.*;
+import static org.quartz.JobBuilder.*;
+import static org.quartz.CronScheduleBuilder.*;
+
 import java.sql.DriverManager;
 import java.text.ParseException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,21 +28,18 @@ import org.slf4j.LoggerFactory;
  */
 public class PoseidonServer {
 	
+	/**
+	 * Server ID, obtained from the property file
+	 */
+	static public int serverId;	
+	
 	static private String jdbcURL,username,password;
 	static private SchedulerFactory schedFact;
 	static private Scheduler sched;	
 	static private Configuration prop;
-	static private Logger logger;
-	
-	/**
-	 * Server ID, obtained from the property file
-	 */
-	static public int serverId;
-	
-	/**
-	 *  Flag whether server is enabled
-	 */
-	static public volatile boolean enabled; 
+	static private Logger logger;	
+	static private volatile boolean enabled;
+	static private volatile long rescheduleCount;
 
 	/**
 	 * Main method for the PoseidonServer class.
@@ -111,11 +116,11 @@ public class PoseidonServer {
 			return;
 		}
 		
-		// Create new schedule factory
+		// Create and start Quartz scheduler instance
 		try {					
-			schedFact = new org.quartz.impl.StdSchedulerFactory();
+			schedFact = new StdSchedulerFactory();
 			sched = schedFact.getScheduler();
-			sched.addGlobalTriggerListener(new PoseidonTriggerListener());
+			sched.getListenerManager().addTriggerListener(new PoseidonTriggerListener());
 
 			sched.start();	
 		} catch (Exception e) {
@@ -124,6 +129,7 @@ public class PoseidonServer {
 		}
 		
 		enabled = true;
+		rescheduleCount = 0;
 	}
 	
 	
@@ -161,7 +167,7 @@ public class PoseidonServer {
 		}
 		
 		try {
-			sched.shutdown();
+			sched.shutdown(true);
 		} catch (SchedulerException e) {
 			// Do nothing, we are shutting down
 		}
@@ -184,60 +190,54 @@ public class PoseidonServer {
 	private static void scheduleScript(Script script) throws ParseException  {
 		JobDetail jobDetail;
 		JobDataMap jobData;
-		CronTrigger trigger;		
+		Trigger  trigger;		
 		
 		// Try to find job with this script id first		
 		try {
-			if ((jobDetail = sched.getJobDetail(script.getScript_id()+"",Scheduler.DEFAULT_GROUP)) != null) {
+			if ((jobDetail = sched.getJobDetail(jobKey(script.getScriptIdStr()))) != null) {
 				
 				// Script already exists, check if it has been updated
 				jobData = jobDetail.getJobDataMap();
 				if (jobData.getLong("update_sysdate") != script.getUpdate_sysdate().getTime()) {
-					logger.debug("Job timestamp:"+jobData.getLong("update_sysdate"));
-					logger.debug("Script timestamp:"+script.getUpdate_sysdate().getTime());
+					
 					// Script was updated, we need to change trigger schedule
 					logger.info("Rescheduling script:"+script.getName());
+					rescheduleCount++;
 					
-					trigger = new CronTrigger(script.getScript_id()+"",
-							Scheduler.DEFAULT_GROUP,
-							script.getFullSchedule());
-					trigger.setJobName(script.getScript_id()+"");
-					trigger.setJobGroup(Scheduler.DEFAULT_GROUP);
-					sched.rescheduleJob(script.getScript_id()+"",
-							Scheduler.DEFAULT_GROUP,
-							trigger);
 					// Update timestamp in the job detail
 					jobData.put("update_sysdate",script.getUpdate_sysdate().getTime());
-					jobDetail.setJobDataMap(jobData);
+					sched.addJob(jobDetail, true);
+					
+					trigger = newTrigger()
+						    .withIdentity(script.getScriptIdStr())
+						    .withSchedule(cronSchedule(script.getFullSchedule()))
+						    .build();
+					sched.rescheduleJob(triggerKey(script.getScriptIdStr()),
+							trigger);
 					
 				}
 			} else {	
 				// No job for this script yet, create new one
-				logger.info("Scheduling script:"+script.getName()+" using schedule ["+script.getFullSchedule()+"]");
+				logger.info("Scheduling script ["+script.getName()+"] using schedule ["+script.getFullSchedule()+"]");
 				
-				jobDetail = new JobDetail(script.getScript_id()+"",
-						Scheduler.DEFAULT_GROUP,
-		                PoseidonJob.class);
+				jobDetail = newJob(PoseidonJob.class)
+					    .withIdentity(script.getScriptIdStr())
+					    .usingJobData("script_id", script.getScript_id())
+					    .usingJobData("update_sysdate", script.getUpdate_sysdate().getTime())
+					    .storeDurably()
+					    .build();
 				
-				jobData = new JobDataMap();
-				jobData.put("script_id",script.getScript_id());
-				jobData.put("update_sysdate",script.getUpdate_sysdate().getTime());
-				
-				jobDetail.setJobDataMap(jobData);
-				
-				trigger = new CronTrigger(script.getScript_id()+"",
-						Scheduler.DEFAULT_GROUP,
-						script.getFullSchedule());
+				trigger = newTrigger()
+					    .withIdentity(script.getScriptIdStr())
+					    .withSchedule(cronSchedule(script.getFullSchedule()))
+					    .build();
 				
 				sched.scheduleJob(jobDetail,trigger);
 			}
 			
 		} catch (SchedulerException e) {
 			logger.error("Can not schedule script "+script.getScript_id()+":"+e.getMessage());			
-		} catch (ParseException e) {			
-			logger.error("Can not schedule script "+script.getScript_id()+":"+e.getMessage());
-			logger.error("Schedule:"+script.getFullSchedule());
-		}
+		} 
 		
 	}
 	
@@ -248,10 +248,8 @@ public class PoseidonServer {
 	 * @throws ParseException
 	 */
 	private static void unscheduleScript(Script script) {
-		JobDetail jobDetail;			
-		
 		try {
-			if ((jobDetail = sched.getJobDetail(script.getScript_id()+"",Scheduler.DEFAULT_GROUP)) == null) {
+			if ((sched.getJobDetail(jobKey(script.getScriptIdStr()))) == null) {
 				// There is no scheduled job - return
 				return;
 			}
@@ -262,8 +260,7 @@ public class PoseidonServer {
 		
 		try {
 			logger.info("Unscheduling script:"+script.getName());
-			sched.unscheduleJob(jobDetail.getName(),
-						Scheduler.DEFAULT_GROUP);
+			sched.deleteJob(jobKey(script.getScriptIdStr()));
 		} catch (SchedulerException e) {
 			logger.error("Error unscheduling script "+script.getScript_id()+":"+e.getMessage());
 			return;
@@ -280,6 +277,13 @@ public class PoseidonServer {
 			logger.error("Mandatory property "+propertyName+" is not set");
 			System.exit(1);
 		}
+	}
+
+	/**
+	 * @return the rescheduleCount
+	 */
+	public static long getRescheduleCount() {
+		return rescheduleCount;
 	}
 		
 	

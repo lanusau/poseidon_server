@@ -1,19 +1,21 @@
 package com.untd.database.poseidon;
 
 import java.util.Vector;
+
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.StatefulJob;
 
 
 /**
- * This is a main universal Quartz scheduler job, that executes all the scripts. It
- * implements Quartz StatefulJob, which means that only one instance of the particular
- * script can be running at any given time. 
- *
+ * This is a main universal Quartz scheduler job, that executes all the scripts. 
+ * Only one instance of the particular script can be running at any given time. 
  */
-public class PoseidonJob implements StatefulJob {
+
+@DisallowConcurrentExecution
+public class PoseidonJob implements Job {
 	
 	org.nfunk.jep.JEP expressionParser;
 	Script script;

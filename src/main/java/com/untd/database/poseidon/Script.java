@@ -438,6 +438,13 @@ public class Script {
 	public int getScript_id() {
 		return script_id;
 	}
+	
+	/**
+	 * @return string value of script ID
+	 */
+	public String getScriptIdStr() {
+		return String.valueOf(script_id);
+	}
 
 	/**
 	 * Get severity_column_position field
