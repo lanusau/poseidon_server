@@ -59,7 +59,8 @@ public class PoseidonServerTest {
 
 		// Set property for serverId
 		PoseidonConfiguration.getConfiguration().setProperty("serverId", String.valueOf(TestSetup.server_id));
-
+		
+		logger.warn("This test may run up to 2 minutes");
 	}
 	
 	/**
@@ -133,9 +134,7 @@ public class PoseidonServerTest {
 	        }
 	    });		
 		poseidonServerThread.setName("PoseidonServer");
-		poseidonServerThread.start();
-		
-		logger.warn("This test may run up to 2 minutes");
+		poseidonServerThread.start();			
 		
 		// Email should be sent in maximum 2 minutes
 		assertTrue(fakeMailServer.waitForIncomingEmail(2*60*1000, 1));
