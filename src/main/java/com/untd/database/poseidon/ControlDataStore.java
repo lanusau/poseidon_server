@@ -233,7 +233,8 @@ public class ControlDataStore {
 		
 		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.logScriptStartSQL"), Statement.RETURN_GENERATED_KEYS);		 
 		st.setInt(1,script.getScript_id());
-		st.setShort(2,ExecutionResult.RESULT_NOT_FINISHED);
+		st.setInt(2,PoseidonServer.serverId);
+		st.setShort(3,ExecutionResult.RESULT_NOT_FINISHED);
 		st.execute();
 		
 		// Get AUTOINCREMENT column value 

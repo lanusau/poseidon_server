@@ -60,6 +60,9 @@ public class PoseidonServerTest {
 		// Set property for serverId
 		PoseidonConfiguration.getConfiguration().setProperty("serverId", String.valueOf(TestSetup.server_id));
 		
+		// Reduce sleep time between Poseidon check cycles
+		PoseidonConfiguration.getConfiguration().setProperty("mainThreadSleepMs", "500");		
+		
 		logger.warn("This test may run up to 2 minutes");
 	}
 	
@@ -141,8 +144,8 @@ public class PoseidonServerTest {
 				
 		PoseidonServer.disable();
 		
-		// Give a server few seconds to shutdown
-		Thread.sleep(5*1000);
+		// Give a server some time to shut down
+		Thread.sleep(PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepMs")*3);
 		
 		// Thread now should be dead
 		assertFalse(poseidonServerThread.isAlive());
@@ -186,7 +189,7 @@ public class PoseidonServerTest {
 		st.execute();
 		
 		// Wait few cycles
-		Thread.sleep(PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepSec",5)*1000*3);
+		Thread.sleep(PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepMs")*3);
 		
 		// There should be only 1 reschedule event
 		assertEquals(1,PoseidonServer.getRescheduleCount());
