@@ -421,8 +421,11 @@ public class Script {
 	 * @return full schedule script
 	 */
 	public String getFullSchedule() {
+		// Randomly pick a second to run this script, to reduce flood of executions
+		// at the minute boundary
+		long schedule_sec = Math.round(Math.random()*59);
 		return 
-			"0 "+
+			schedule_sec + " "+
 			schedule_min+" "+
 			schedule_hour+" "+
 			schedule_day+" "+
