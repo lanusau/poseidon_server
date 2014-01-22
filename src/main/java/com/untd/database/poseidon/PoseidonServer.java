@@ -157,7 +157,7 @@ public class PoseidonServer {
 				// Send heart beat to the server table
 				ControlDataStore.logHeartbeat(serverId);
 				
-				Thread.sleep(prop.getInt("mainThreadSleepSec",5)*1000);
+				Thread.sleep(prop.getInt("mainThreadSleepMs",5000));
 																				
 
 			} catch (Exception e) {
