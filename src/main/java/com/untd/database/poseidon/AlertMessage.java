@@ -1,5 +1,8 @@
 package com.untd.database.poseidon;
 
+import com.untd.database.poseidon.data.Script;
+import com.untd.database.poseidon.data.Target;
+
 
 /**
  * 
@@ -34,16 +37,16 @@ public class AlertMessage {
 		
 		messageBody = new StringBuilder();
 		
-		messageSubject = script.getMessage_subject().replaceAll("%t",target.getName());
+		messageSubject = script.getMessageSubject().replaceAll("%t",target.getName());
 		messageSubject = messageSubject.replaceAll("%n",script.getName());
 		
-		messageHeader = script.getMessage_header().replaceAll("%t",target.getName());
+		messageHeader = script.getMessageHeader().replaceAll("%t",target.getName());
 		messageHeader = messageHeader.replaceAll("%n",script.getName());
 		messageHeader = messageHeader.replaceAll("%rc",""+result.getRows().size());
 		
-		messageFooter = script.getMessage_footer();
+		messageFooter = script.getMessageFooter();
 		
-		messageFormat = script.getMessage_format();
+		messageFormat = script.getMessageFormat();
 		
 		severityTxt = "Low";
 	}
@@ -59,7 +62,7 @@ public class AlertMessage {
 		String rowMessage;
 		
 		// Add alert from this row to the message text
-		rowMessage = script.getMessage_text();
+		rowMessage = script.getMessageTextStr();
 		
 		// For each column, replace variable %x			
 		for (int i=0;i<row.getColumns().size();i++) {

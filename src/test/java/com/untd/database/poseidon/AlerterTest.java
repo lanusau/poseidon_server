@@ -2,6 +2,7 @@ package com.untd.database.poseidon;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -9,11 +10,13 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
 import com.icegreen.greenmail.util.GreenMail;
+import com.untd.database.poseidon.data.Script;
+import com.untd.database.poseidon.data.Target;
 
 public class AlerterTest {
 
 	@Test
-	public void testAlert() throws ConfigurationException, SQLException {
+	public void testAlert() throws ConfigurationException, SQLException, IOException {
 		
 		TestSetup.setup();	
 		
@@ -23,8 +26,8 @@ public class AlerterTest {
 		PoseidonConfiguration.getConfiguration().setProperty("mail.smtp.port", String.valueOf(fakeMailServer.getSmtp().getPort()));
 		
 		// Create AlertMessage object
-		Script script = new Script(TestSetup.connection,TestSetup.script_id);		
-		Target target = new Target(TestSetup.connection,TestSetup.target_id);
+		Script script = ControlDataStore.getScript(TestSetup.script_id);		
+		Target target = ControlDataStore.getScriptTargets(script,PoseidonConfiguration.getConfiguration().getInt("serverId")).get(0);
 		ExecutionResult fakeExecutionResult = new ExecutionResult();
 		fakeExecutionResult.setResultCode(ExecutionResult.RESULT_FINISHED_NOT_TRIGGERED);		
 		fakeExecutionResult.setSeverity(Script.SEVERITY_LOW);

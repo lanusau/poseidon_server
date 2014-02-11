@@ -5,16 +5,26 @@ package com.untd.database.poseidon;
  */
 public class Notification {
 
+	private Integer notifyGroupEmailId;
 	private short severity;
 	private String emailAddress;
 	
+
 	/**
-	 * @param paramSeverity severity level
-	 * @param paramEmailAddress email address
+	 * Getter method for notifyGroupEmailId
+	 * 
+	 * @return notifyGroupEmailId
 	 */
-	public Notification(short paramSeverity,String paramEmailAddress) {
-		severity = paramSeverity;
-		emailAddress = paramEmailAddress;
+	public Integer getNotifyGroupEmailId() {
+		return notifyGroupEmailId;
+	}
+
+	/**
+	 * Setter method for notifyGroupEmailId
+	 * @param notifyGroupEmailId
+	 */
+	public void setNotifyGroupEmailId(Integer notifyGroupEmailId) {
+		this.notifyGroupEmailId = notifyGroupEmailId;
 	}
 
 	/**

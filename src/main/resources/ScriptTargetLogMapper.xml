@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.untd.database.poseidon.data.ScriptTargetLogMapper" >
+  <insert id="insert" parameterType="com.untd.database.poseidon.data.ScriptTargetLog"
+                      useGeneratedKeys="true" keyProperty="scriptTargetLogId" >
+    insert into psd_script_target_log (script_log_id, target_id, 
+      start_date, finish_date, status_number, 
+      severity, create_sysdate, update_sysdate, 
+      error_message)
+    values ( #{scriptLogId,jdbcType=INTEGER}, #{targetId,jdbcType=INTEGER}, 
+      now(), null, #{statusNumber,jdbcType=INTEGER}, 
+      #{severity,jdbcType=INTEGER}, now(), now(), 
+      #{errorMessage,jdbcType=LONGVARCHAR})
+  </insert>
+  <update id="update" parameterType="com.untd.database.poseidon.data.ScriptTargetLog" >
+    update psd_script_target_log
+    set finish_date = now(),
+      status_number = #{statusNumber,jdbcType=INTEGER},
+      severity = #{severity,jdbcType=INTEGER},
+      update_sysdate = now(),
+      error_message = #{errorMessage,jdbcType=LONGVARCHAR}
+    where script_target_log_id = #{scriptTargetLogId,jdbcType=INTEGER}
+  </update>
+  <insert id="insertRow" parameterType="com.untd.database.poseidon.data.ScriptTargetRowLog" 
+                         useGeneratedKeys="true" keyProperty="scriptTargetRowLogId" >                         
+    insert into psd_script_target_row_log(script_target_log_id, row_number,
+      expression_result, expression_error_message, severity, create_sysdate, update_sysdate)
+    values (#{scriptTargetLogId,jdbcType=INTEGER},#{rowNumber},
+      #{expressionResult},#{expressionErrorMessage},#{severity}now(),now())                             
+  </insert>
+  <insert id="insertColumn" parameterType="com.untd.database.poseidon.data.ScriptTargetColLog">                         
+    insert into psd_script_target_col_log(
+      script_target_row_log_id, column_number, column_value, create_sysdate, update_sysdate)
+    values (#{scriptTargetRowLogId},#{columnNumber},#{columnValue},now(),now())                          
+  </insert>
+</mapper>

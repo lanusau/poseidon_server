@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.text.ParseException;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -20,6 +21,8 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.untd.database.poseidon.data.Script;
 
 /**
  * 
@@ -33,7 +36,6 @@ public class PoseidonServer {
 	 */
 	static public int serverId;	
 	
-	static private String jdbcURL,username,password;
 	static private SchedulerFactory schedFact;
 	static private Scheduler sched;	
 	static private Configuration prop;
@@ -62,7 +64,6 @@ public class PoseidonServer {
 			PoseidonConfiguration.init();
 			PoseidonConfiguration.addPropertyFile("poseidon-default.conf");
 			PoseidonConfiguration.addPropertyFile("poseidon.conf");
-			SqlText.init();
 		} catch (ConfigurationException e) {
 			logger.error("Error trying to load properties: " + e.getMessage());
 			System.exit(1);
@@ -93,10 +94,7 @@ public class PoseidonServer {
 		assertMandatoryProperty("username");
 		assertMandatoryProperty("password");
 						
-		serverId = prop.getInt("serverId");	
-		jdbcURL = prop.getString("controlConnectionDescription");
-		username = prop.getString("username");
-		password = prop.getString("password");		
+		serverId = prop.getInt("serverId");		
 											
 		logger.info("Starting server ID:"+serverId);
 						
@@ -110,10 +108,10 @@ public class PoseidonServer {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			DriverManager.registerDriver(new org.postgresql.Driver());
 			
-			ControlDataStore.init(jdbcURL,username,password);
+			ControlDataStore.init(ConfigurationConverter.getProperties(prop));
 		} catch (Exception e) {
 			logger.error("Can not connect to control database:"+e.getMessage());
-			return;
+			System.exit(1);
 		}
 		
 		// Create and start Quartz scheduler instance
@@ -198,14 +196,14 @@ public class PoseidonServer {
 				
 				// Script already exists, check if it has been updated
 				jobData = jobDetail.getJobDataMap();
-				if (jobData.getLong("update_sysdate") != script.getUpdate_sysdate().getTime()) {
+				if (jobData.getLong("update_sysdate") != script.getUpdateSysdate().getTime()) {
 					
 					// Script was updated, we need to change trigger schedule
 					logger.info("Rescheduling script:"+script.getName());
 					rescheduleCount++;
 					
 					// Update timestamp in the job detail
-					jobData.put("update_sysdate",script.getUpdate_sysdate().getTime());
+					jobData.put("update_sysdate",script.getUpdateSysdate().getTime());
 					sched.addJob(jobDetail, true);
 					
 					trigger = newTrigger()
@@ -222,8 +220,8 @@ public class PoseidonServer {
 				
 				jobDetail = newJob(PoseidonJob.class)
 					    .withIdentity(script.getScriptIdStr())
-					    .usingJobData("script_id", script.getScript_id())
-					    .usingJobData("update_sysdate", script.getUpdate_sysdate().getTime())
+					    .usingJobData("script_id", script.getScriptId())
+					    .usingJobData("update_sysdate", script.getUpdateSysdate().getTime())
 					    .storeDurably()
 					    .build();
 				
@@ -236,7 +234,7 @@ public class PoseidonServer {
 			}
 			
 		} catch (SchedulerException e) {
-			logger.error("Can not schedule script "+script.getScript_id()+":"+e.getMessage());			
+			logger.error("Can not schedule script "+script.getScriptId()+":"+e.getMessage());			
 		} 
 		
 	}
@@ -254,7 +252,7 @@ public class PoseidonServer {
 				return;
 			}
 		} catch (SchedulerException e) {
-			logger.error("Error looking up script "+script.getScript_id()+":"+e.getMessage());
+			logger.error("Error looking up script "+script.getScriptId()+":"+e.getMessage());
 			return;
 		}
 		
@@ -262,7 +260,7 @@ public class PoseidonServer {
 			logger.info("Unscheduling script:"+script.getName());
 			sched.deleteJob(jobKey(script.getScriptIdStr()));
 		} catch (SchedulerException e) {
-			logger.error("Error unscheduling script "+script.getScript_id()+":"+e.getMessage());
+			logger.error("Error unscheduling script "+script.getScriptId()+":"+e.getMessage());
 			return;
 		}
 	}

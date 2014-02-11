@@ -2,6 +2,7 @@ package com.untd.database.poseidon;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -19,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.icegreen.greenmail.util.GreenMail;
+import com.untd.database.poseidon.data.Script;
+import com.untd.database.poseidon.data.Target;
 
 public class PoseidonServerTest {
 	
@@ -30,9 +33,10 @@ public class PoseidonServerTest {
 	 * Setup configuration
 	 * @throws ConfigurationException
 	 * @throws SQLException
+	 * @throws IOException 
 	 */
 	@BeforeClass
-	public static void BeforeClass() throws ConfigurationException, SQLException {	
+	public static void BeforeClass() throws ConfigurationException, SQLException, IOException {	
 		String sql;
 		PreparedStatement st;
 		
@@ -152,7 +156,10 @@ public class PoseidonServerTest {
 		
 		// Subject is set to [%t] Test
 		MimeMessage message = fakeMailServer.getReceivedMessages()[0];
-		Target target = new Target(TestSetup.connection,TestSetup.target_id);
+		
+		Script script = ControlDataStore.getScript(TestSetup.script_id);
+		Target target = ControlDataStore.getScriptTargets(script,PoseidonServer.serverId).get(0);
+		
 		assertEquals(message.getSubject(),"["+target.getName()+"] Test");		
 
 	}

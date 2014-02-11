@@ -7,6 +7,8 @@ import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.slf4j.LoggerFactory;
 
+import com.untd.database.poseidon.data.Script;
+
 
 /**
  * Purpose of this listener is to capture trigger misfires.

@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.untd.database.poseidon.data.Script;
+
 
 /**
  * Executor to execute SQL statements
@@ -23,11 +25,11 @@ public class SQLExecutor extends Executor {
 		
 		ResultSet rs;	
 		
-		st = conn.prepareStatement(script.getQuery_text());
+		st = conn.prepareStatement(script.getQueryText());
 		
 		// As of 04/10/2008 setQueryTimeout was not implemented in Postgres driver
 		if (conn.getMetaData().getDriverName() != "PostgreSQL Native Driver") {
-			st.setQueryTimeout(script.getTimeout_sec());
+			st.setQueryTimeout(script.getTimeoutSec());
 		}	
 		rs = st.executeQuery();
 		while (rs.next()) {

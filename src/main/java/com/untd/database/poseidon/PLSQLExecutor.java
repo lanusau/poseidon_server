@@ -3,6 +3,9 @@ package com.untd.database.poseidon;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import com.untd.database.poseidon.data.Script;
+
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleTypes;
 
@@ -22,8 +25,8 @@ public class PLSQLExecutor extends Executor {
 				
 		ResultSet rs;	
 		
-		st = (OracleCallableStatement)conn.prepareCall(script.getQuery_text());	
-		st.setQueryTimeout(script.getTimeout_sec());
+		st = (OracleCallableStatement)conn.prepareCall(script.getQueryText());	
+		st.setQueryTimeout(script.getTimeoutSec());
 
 
 		st.registerOutParameter (1, OracleTypes.CURSOR);

@@ -77,6 +77,11 @@
     	<version>1.3.1b</version>
     	<scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>3.2.4</version>
+    </dependency>
   </dependencies>
   <description>Poseidon monitoring server is a software that monitors databases based on  a repository of scripts. </description>
   <organization>
@@ -89,8 +94,13 @@
         <directory>src/main/resources</directory>
         <includes>
           <include>poseidon-default.conf</include>
-          <include>sqltext.properties</include>
           <include>quartz.properties</include>
+          <include>mybatis-config.xml</include>
+          <include>ScriptLogMapper.xml</include>
+          <include>ScriptMapper.xml</include>
+          <include>ScriptTargetLogMapper.xml</include>
+          <include>ServerMapper.xml</include>
+          <include>TargetMapper.xml</include>
         </includes>
       </resource>
     </resources>

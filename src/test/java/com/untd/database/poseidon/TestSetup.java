@@ -1,5 +1,6 @@
 package com.untd.database.poseidon;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,6 +9,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+
 public class TestSetup {
 	
 	public static Connection connection;
@@ -15,12 +17,11 @@ public class TestSetup {
 	public static int target_id;
 	public static int server_id;
 	
-	public static void setup() throws SQLException, ConfigurationException {
+	public static void setup() throws SQLException, ConfigurationException, IOException {
 		
 		// Initialize configuration
 		PoseidonConfiguration.init();
-		PoseidonConfiguration.addPropertyFile("poseidon-test.conf");
-		SqlText.init();
+		PoseidonConfiguration.addPropertyFile("poseidon-test.conf");		
 		
 		// Connect to the test database
 		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
@@ -49,7 +50,7 @@ public class TestSetup {
 			server_id = rs.getInt(2);
 		} else {
 			target_id = 0;
-		} 
+		} 				
 	}
 	
 	public static void done() throws SQLException {

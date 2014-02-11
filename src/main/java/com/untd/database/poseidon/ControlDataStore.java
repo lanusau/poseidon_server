@@ -1,312 +1,233 @@
 package com.untd.database.poseidon;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import com.untd.database.poseidon.data.Script;
+import com.untd.database.poseidon.data.ScriptLog;
+import com.untd.database.poseidon.data.ScriptLogMapper;
+import com.untd.database.poseidon.data.ScriptMapper;
+import com.untd.database.poseidon.data.ScriptTargetColLog;
+import com.untd.database.poseidon.data.ScriptTargetLog;
+import com.untd.database.poseidon.data.ScriptTargetLogMapper;
+import com.untd.database.poseidon.data.ScriptTargetRowLog;
+import com.untd.database.poseidon.data.ServerMapper;
+import com.untd.database.poseidon.data.Target;
+import com.untd.database.poseidon.data.TargetMapper;
 
 
 /**
- * This class groups static method to get control information from the 
+ * This class groups static method to query/update control information from the 
  * control database
  *
  */
 
 public class ControlDataStore {	
+	
+	/**
+	 * MyBatis Session Factory
+	 */
+	private static SqlSessionFactory sqlSessionFactory;
 
-	static private String jdbcURL,username,password;
-	static private Connection controlConnection;
-	static private int maxConnectionRetryCount;
 
 	/**
 	 * 
 	 * Initialize control database data store
 	 * 
-	 * @param paramJdbcURL JDBC URL for control database
-	 * @param paramUsername username for control database 
-	 * @param paramPassword password for control database
-	 * @throws SQLException
+	 * @throws IOException 
 	 */
-	public static void init(
-			String paramJdbcURL, 
-			String paramUsername, 
-			String paramPassword) throws SQLException{
+	public static void init(Properties prop) throws IOException{
 		
-		jdbcURL = paramJdbcURL;
-		username = paramUsername;
-		password = paramPassword;
-		
-
-		maxConnectionRetryCount = PoseidonConfiguration.getConfiguration().getInt("maxConnectionRetryCount",5);
-		
-		connect();
+		String resource = "mybatis-config.xml";
+		InputStream inputStream = Resources.getResourceAsStream(resource);
+		sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream,prop);
 	}
+		
 	
 	/**
-	 * Connect to control database
-	 * @throws SQLException
-	 */
-	private static void connect() throws SQLException{
-		int try_count = 0;
-		SQLException exception_CanNotConnect;
-		String sqlErrorMessage;
-		
-		sqlErrorMessage = ""; 
-		
-		controlConnection = ping(controlConnection);
-		
-		if (controlConnection == null) {
-			while ((controlConnection == null) && (try_count++ < maxConnectionRetryCount) ) {
-				try {
-					controlConnection = DriverManager.getConnection(
-							jdbcURL,
-							username,
-							password);		
-					controlConnection.setAutoCommit(false);				
-				} catch (SQLException e) {
-					sqlErrorMessage = e.getMessage();
-					// Do nothing - just sleep and keep trying to reconnect
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {						
-					}
-				}				
-			}								
-		}		
-		
-		// If connection is still null, raise exception
-		if (controlConnection == null) {
-			exception_CanNotConnect = new SQLException("Can not connect to the control database:"+sqlErrorMessage); 
-			throw  exception_CanNotConnect;
-		}
-
-	}
-	
-	/**
-	 * 
-	 * Ping connection to check its health. Return original connection if success,
-	 * otherwise return null
-	 * @param conn JDBC connection
-	 * 
-	 */
-	public static Connection ping(Connection conn) {
-		PreparedStatement st;
-		ResultSet rs;
-				
-		if (conn == null) return null;
-		
-		try {
-			// pinging for MySQL
-			st = conn.prepareStatement(SqlText.getString("ControlDataStore.pingSQL"));
-			rs = st.executeQuery();
-			
-			while (rs.next());
-			
-			rs.close();
-			st.close();
-			
-			return conn;
-		} catch (SQLException e) {
-			// Something is not right with this connection, try to close it			
-			try {
-				conn.close();
-			} catch (SQLException e1){
-				// Do nothing - we trying to close it
-			}
-			return null;
-		}
-	}
-	
-	/**
-	 * Build new script object using provided script id
+	 * Return script using provided script id
 	 * @param scriptId script id
 	 * @return {@link Script}
 	 * @throws SQLException
 	 */
-	synchronized public static Script getScript(int scriptId) throws SQLException{
-		connect();
-		return new Script(controlConnection,scriptId);
+	synchronized public static Script getScript(int scriptId) {		
+		Script script;
+		
+		SqlSession session = sqlSessionFactory.openSession();
+		
+		try {
+			ScriptMapper mapper = session.getMapper(ScriptMapper.class);
+			script = mapper.select(scriptId);
+		} finally {
+		    session.close();
+		}
+		
+		return script;
 	}
 	
 	/**
 	 * Get a list of active scripts for this server
 	 * @param serverId server id
 	 * @return array list of scripts
-	 * @throws SQLException
 	 */
-	public static ArrayList<Script> getActiveScriptList(int serverId) throws SQLException {
-		ArrayList<Script> scriptList;
-		PreparedStatement st;
-		ResultSet rs;
+	public static List<Script> getActiveScriptList(int serverId) {
+		List<Script> scriptList;
 		
-		connect();
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		scriptList = new ArrayList<Script>();
-		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.activeScriptSQL")); 
-		
-		st.setInt(1,serverId);
-		st.setInt(2,serverId);
-		rs = st.executeQuery();
-		while (rs.next()) {
-			scriptList.add(new Script(rs));
+		try {
+			ScriptMapper mapper = session.getMapper(ScriptMapper.class);
+			scriptList =  mapper.selectActive(serverId);
+		} finally {
+		    session.close();
 		}
-		
-		rs.close();
-		st.close();
-		
 		
 		return scriptList;
 	}
 	
 	/**
-	 * Get a list of inactive scripts for this server id
+	 * Get a list of inactive scripts for this server
 	 * @param serverId server id
 	 * @return array list of scripts
-	 * @throws SQLException
 	 */
-	public static ArrayList<Script> getInactiveScriptList(int serverId) throws SQLException {
-		ArrayList<Script> scriptList;
-		PreparedStatement st;
-		ResultSet rs;
+	public static List<Script> getInactiveScriptList(int serverId) {
+		List<Script> scriptList;
 		
-		connect();
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		scriptList = new ArrayList<Script>();
-		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.inactiveScriptSQL"));
-		
-		st.setInt(1,serverId);
-		st.setInt(2,serverId);
-		rs = st.executeQuery();
-		while (rs.next()) {
-			scriptList.add(new Script(rs));
+		try {
+			ScriptMapper mapper = session.getMapper(ScriptMapper.class);
+			scriptList = mapper.selectInactive(serverId);
+		} finally {
+		    session.close();
 		}
-		
-		rs.close();
-		st.close();
-		
 		
 		return scriptList;
-	}
+	}	
 	
 	/**
-	 * Get generated key value 
-	 * @return generated key
-	 * @throws SQLException
+	 * Return notifications assigned for the script for particular severity
+	 * @param script - Script
+	 * @param severity - severity
+	 * @return list of notifications
 	 */
-	private static int getKeyFromStatement(Statement st) throws SQLException{
+	synchronized public static List<Notification> getScriptNotifications(Script script, short severity) {
+        ArrayList<Notification> notificationList = new ArrayList<Notification>();
+        
+        SqlSession session = sqlSessionFactory.openSession();
 		
-		ResultSet rs;
-		int keyValue;
-		
-		rs = st.getGeneratedKeys();
-		
-		if (rs.next()){
-			keyValue = rs.getInt(1);
-		} else {
-			throw new SQLException("Can not obtain AUTOINCREMENT column value"); 
+		try {
+			ScriptMapper mapper = session.getMapper(ScriptMapper.class);
+			// Get notifications assigned through groups
+			for (final Notification n : mapper.selectGroupNotifications(script.getScriptId())) {
+				if (n.getSeverity() == severity) {
+					notificationList.add(n);
+				}
+			}
+			// Get directly assigned notifications
+			for (final Notification n : mapper.selectPersonNotifications(script.getScriptId())) { 
+				n.setSeverity(severity);
+				notificationList.add(n);
+			}
+		} finally {
+		    session.close();
 		}
 		
-		rs.close();
-		
-		return keyValue;		
-		
+		return notificationList;
 	}
+	
 	
 	/**
 	 * Log start of the script
 	 * @param script script object
-	 * @return id of master log entry that can be used later to log subsequent operations
-	 * @throws SQLException
+	 * @return ScriptLog record
 	 */
-	synchronized public static int logScriptStart(Script script) throws SQLException {
-		int scriptLogId;
-		PreparedStatement st;
+	synchronized public static ScriptLog logScriptStart(Script script){
 		
+		ScriptLog scriptLog = new ScriptLog();
+		scriptLog.setScriptId(script.getScriptId());
+		scriptLog.setServerId(PoseidonServer.serverId);
+		scriptLog.setStatusNumber(new Integer(ExecutionResult.RESULT_NOT_FINISHED));
 		
-		connect();
-	
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.logScriptStartSQL"), Statement.RETURN_GENERATED_KEYS);		 
-		st.setInt(1,script.getScript_id());
-		st.setInt(2,PoseidonServer.serverId);
-		st.setShort(3,ExecutionResult.RESULT_NOT_FINISHED);
-		st.execute();
+		try {
+			ScriptLogMapper mapper = session.getMapper(ScriptLogMapper.class);
+			mapper.insert(scriptLog);
+			session.commit();
+		} finally {
+		    session.close();
+		}
 		
-		// Get AUTOINCREMENT column value 
-		scriptLogId = getKeyFromStatement(st);
-		
-		controlConnection.commit();
-		
-		st.close();
-		
-		return scriptLogId;
+		return scriptLog;
+
 	}
 	
 	/**
 	 * Log start of the script on particular target
-	 * @param scriptLogId master log id that was received from {@link #logScriptStart(Script)}
+	 * @param scriptLog  Script Log record that was received from {@link #logScriptStart(Script)}
 	 * @param target
-	 * @return if of the log entry in the script target log table
-	 * @throws SQLException
+	 * @return ScriptTargetLog record
 	 */
-	synchronized public static int logScriptTargetStart(int scriptLogId,Target target) throws SQLException {
-		int scriptTargetLogId;
-		PreparedStatement st;
+	synchronized public static ScriptTargetLog logScriptTargetStart(ScriptLog scriptLog,Target target) {
+		ScriptTargetLog scriptTargetLog = new ScriptTargetLog();
+		scriptTargetLog.setScriptLogId(scriptLog.getScriptLogId());
+		scriptTargetLog.setTargetId(target.getTargetId());
+		scriptTargetLog.setStatusNumber(new Integer(ExecutionResult.RESULT_NOT_FINISHED));
 		
-		connect();
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.logScriptTargetStartSQL"), Statement.RETURN_GENERATED_KEYS);		 
-		st.setInt(1,scriptLogId);
-		st.setInt(2,target.getTarget_id());
-		st.setShort(3,ExecutionResult.RESULT_NOT_FINISHED);
-		st.execute();
+		try {
+			ScriptTargetLogMapper mapper = session.getMapper(ScriptTargetLogMapper.class);
+			mapper.insert(scriptTargetLog);
+			session.commit();
+		} finally {
+		    session.close();
+		}
 		
-		// Get AUTOINCREMENT column value 
-		scriptTargetLogId = getKeyFromStatement(st);
-		controlConnection.commit();
-		
-		st.close();
-		
-		return scriptTargetLogId;
+		return scriptTargetLog;
 	}
 	
 
 	/**
 	 * Log end of a script execution
 	 * @param script script
-	 * @param scriptLogId master log id that was received from {@link #logScriptStart(Script)}
-	 * @throws SQLException
+	 * @param scriptLog ScriptLog that was received from {@link #logScriptStart(Script)}
 	 */
-	synchronized public static void logScriptEnd(Script script,int scriptLogId) throws SQLException {
+	synchronized public static void logScriptEnd(Script script,ScriptLog scriptLog) {
 		
-		PreparedStatement st;		
+
+		scriptLog.setStatusNumber(new Integer(ExecutionResult.RESULT_FINISHED));
 		
-		connect();
-		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.updateScriptLogSQL")); 
-		st.setShort(1,ExecutionResult.RESULT_FINISHED);
 		if (script.hasErrorOccured()) {
-			st.setInt(2,1);
+			scriptLog.setErrorStatusCode(1);			
 		} else {
-			st.setInt(2,0);
+			scriptLog.setErrorStatusCode(0);
 		}
 		if (script.isTriggered()) {
-			st.setInt(3,1);
+			scriptLog.setTriggerStatusCode(1);			
 		} else {
-			st.setInt(3,0);
+			scriptLog.setTriggerStatusCode(0);
 		}
 		
-		st.setInt(4,scriptLogId);
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		st.execute();
-		controlConnection.commit();
+		try {
+			ScriptLogMapper mapper = session.getMapper(ScriptLogMapper.class);
+			mapper.update(scriptLog);
+			session.commit();
+		} finally {
+		    session.close();
+		}
 		
-		st.close();
 	}
 	
 	/**
@@ -314,111 +235,121 @@ public class ControlDataStore {
 	 * Miss-fire happens when script was supposed to run but didn't, most likely due to 
 	 * lack of available Quartz threads
 	 * @param script script
-	 * @throws SQLException
 	 */
-	synchronized public static void logScriptMissfire(Script script) throws SQLException {		
-		PreparedStatement st;
+	synchronized public static void logScriptMissfire(Script script)  {	
+		ScriptLog scriptLog = new ScriptLog();
+		scriptLog.setScriptId(script.getScriptId());
+		scriptLog.setServerId(PoseidonServer.serverId);
+		scriptLog.setStatusNumber(new Integer(ExecutionResult.RESULT_MISSFIRED));
 		
-		connect();
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.logScriptMissfireSQL"));		
-		st.setInt(1,script.getScript_id());
-		st.setShort(2,ExecutionResult.RESULT_MISSFIRED);
-		st.execute();
-		
-		controlConnection.commit();
-		
-		st.close();		
+		try {
+			ScriptLogMapper mapper = session.getMapper(ScriptLogMapper.class);
+			mapper.insert(scriptLog);
+			session.commit();
+		} finally {
+		    session.close();
+		}		
 	}
 	
 	/**
 	 * Log script timeout.
 	 * Timeout happens when script takes too long to execute.
 	 * @param script script
-	 * @param scriptLogId master log id that was received from {@link #logScriptStart(Script)}
-	 * @throws SQLException
+	 * @param scriptLogId ScriptLog that was received from {@link #logScriptStart(Script)}
 	 */
-	synchronized public static void logScriptTimeout(Script script,int scriptLogId) throws SQLException {
+	synchronized public static void logScriptTimeout(Script script,ScriptLog scriptLog) {
+		scriptLog.setStatusNumber(new Integer(ExecutionResult.RESULT_TIMEDOUT));
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		PreparedStatement st;		
+		try {
+			ScriptLogMapper mapper = session.getMapper(ScriptLogMapper.class);
+			mapper.update(scriptLog);
+			session.commit();
+		} finally {
+		    session.close();
+		}		
+	}
+	
+
+	/**
+	 * @param scriptTargetLog - ScriptTargetLog that was received from {@link #logScriptTargetStart(ScriptLog ,Target)}
+	 * @param result - Execution result
+	 */
+	synchronized public static void logScriptTargetEnd(ScriptTargetLog scriptTargetLog,ExecutionResult result)  {		
 		
-		connect();
+		int rowNum,colNum;
 		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.updateScriptLogSQL")); 
-		st.setShort(1,ExecutionResult.RESULT_TIMEDOUT);
-		st.setInt(2,1);
-		st.setInt(3,0);		
-		st.setInt(4,scriptLogId);
+		scriptTargetLog.setStatusNumber(new Integer(result.getResultCode()));
+		scriptTargetLog.setErrorMessage(result.getResultErrorMsg());
+		scriptTargetLog.setSeverity(new Integer(result.getSeverity()));
+
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		st.execute();
-		controlConnection.commit();
+		try {
+			ScriptTargetLogMapper mapper = session.getMapper(ScriptTargetLogMapper.class);
+			mapper.update(scriptTargetLog);
+			
+			// Dump rows
+			rowNum = 0;
+			for (final ExecutionResultRow row : result.getRows()) {
+				
+				ScriptTargetRowLog rowLog = new ScriptTargetRowLog();				
+				rowLog.setScriptTargetLogId(scriptTargetLog.getScriptTargetLogId());
+				rowLog.setRowNumber(rowNum);
+				rowLog.setExpressionResult(row.getExpressionResult());
+				rowLog.setExpressionErrorMessage(row.getExpressionErrorMsg());
+				rowLog.setSeverity(row.getExpressionSeverity());
+				mapper.insertRow(rowLog);
+				
+				// Dump columns			
+				colNum = 0;
+				for (String columnValue : row.getColumns()) {	
+					ScriptTargetColLog colLog = new ScriptTargetColLog();
+					
+					colLog.setScriptTargetRowLogId(rowLog.getScriptTargetRowLogId());
+					colLog.setColumnNumber(colNum);
+					colLog.setColumnValue(columnValue);
+					
+					mapper.insertColumn(colLog);
+					
+					colNum++;
+				}
+				
+				rowNum++;
+			}
+			session.commit();
+		} finally {
+		    session.close();
+		}
 		
-		st.close();
 	}
 	
 	/**
-	 * Log end of execution of script on particular target
-	 * @param thread execution thread
-	 * @throws SQLException
+	 * Get a list of targets that particular script should run on
+	 * @param script - Script
+	 * @return list of targets
 	 */
-	synchronized public static void logScriptTargetEnd(ExecutionThread thread) throws SQLException {
+	synchronized public static List<Target> getScriptTargets(Script script, int serverId) {
+		ArrayList<Target> targetList = new ArrayList<Target>();
 		
-		int scriptTargetLogId;
-		ExecutionResult result;
-		PreparedStatement st, stRow,stCol;
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		int scriptTargetRowLogId;
-		int rowNum,colNum;
-		
-		scriptTargetLogId = thread.getScriptTargetLogId();
-		result = thread.getExecutionResult();
-		
-		connect();
-		
-		// Update log record for this target
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.updateScriptTargetLogSQL")); 
-		st.setString(1,result.getResultErrorMsg());
-		st.setShort(2,result.getResultCode());
-		st.setShort(3,result.getSeverity());
-		st.setInt(4,scriptTargetLogId);
-		st.execute();
-		st.close();
-		
-		// Dump result set
-		// Prepare statements for inserting data
-		stRow = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.logScriptRowSQL"), Statement.RETURN_GENERATED_KEYS); 
-		stCol = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.logScriptColSQL")); 
-
-		rowNum = 0;
-		for (final ExecutionResultRow row : result.getRows()) {	
+		try {
+			TargetMapper mapper = session.getMapper(TargetMapper.class);
 			
-			stRow.setInt(1,scriptTargetLogId);
-			stRow.setInt(2,rowNum);
-			stRow.setShort(3,row.getExpressionResult());
-			stRow.setString(4,row.getExpressionErrorMsg());
-			stRow.setShort(5,row.getExpressionSeverity());
-			stRow.execute();
-			
-			// Get AUTOINCREMENT column value 
-			scriptTargetRowLogId = getKeyFromStatement(stRow);
-			
-			rowNum++;
-			
-			// Dump columns			
-			colNum = 0;
-			for (String columnValue : row.getColumns()) {			
-				
-				stCol.setInt(1,scriptTargetRowLogId);
-				stCol.setInt(2,colNum);
-				stCol.setString(3,columnValue);
-				stCol.execute();
-				colNum++;
-			}
+			// Only include targets that are assigned to this server
+			for (final Target t : mapper.selectScriptTargets(script.getScriptId())) {
+				if (t.getServerId() == serverId) {
+					targetList.add(t);
+				}
+			}			
+		} finally {
+		    session.close();
 		}
 		
-		stRow.close();
-		stCol.close();
-		controlConnection.commit();
+		return targetList;
 	}
 	
 	/**
@@ -427,20 +358,17 @@ public class ControlDataStore {
 	 * by updating heartbeat_sysdate column in psd_server table. This allows
 	 * to have external monitor (monitor the monitoring :-) 
 	 * @param serverId our server id
-	 * @throws SQLException
 	 */
-	public static void logHeartbeat(int serverId) throws SQLException {
+	public static void logHeartbeat(int serverId) {
 		
-		PreparedStatement st;		
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		connect();
-		
-		st = controlConnection.prepareStatement(SqlText.getString("ControlDataStore.logHeartbeatSQL")); 		
-		st.setInt(1,serverId);
-		
-		st.execute();
-		controlConnection.commit();
-		
-		st.close();
+		try {
+			ServerMapper mapper = session.getMapper(ServerMapper.class);
+			mapper.heartbeat(serverId);
+			session.commit();
+		} finally {
+		    session.close();
+		}	
 	}
 }

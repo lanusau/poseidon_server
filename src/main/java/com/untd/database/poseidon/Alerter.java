@@ -16,6 +16,8 @@ import org.apache.commons.configuration.ConfigurationConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.untd.database.poseidon.data.Script;
+
 /**
  * Static class that allows threads to alert (send emails) in synchronized fashion
  */

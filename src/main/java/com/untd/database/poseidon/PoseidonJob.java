@@ -8,6 +8,10 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.untd.database.poseidon.data.Script;
+import com.untd.database.poseidon.data.ScriptLog;
+import com.untd.database.poseidon.data.Target;
+
 
 /**
  * This is a main universal Quartz scheduler job, that executes all the scripts. 
@@ -30,7 +34,8 @@ public class PoseidonJob implements Job {
 		
 		Vector<ExecutionThread> executionThreads;		
 		boolean threadsRunning;
-		int scriptLogId,scriptId=0;
+		ScriptLog scriptLog;
+		int scriptId=0;
 		long jobStartTime,jobEndTime;
 		
 		int maxThreadRunTimeSec = PoseidonConfiguration.getConfiguration().getInt("maxThreadRunTimeSec",600);
@@ -44,13 +49,13 @@ public class PoseidonJob implements Job {
 			jobStartTime = System.currentTimeMillis();
 			
 			// Log start of the script
-			scriptLogId = ControlDataStore.logScriptStart(script);
+			scriptLog = ControlDataStore.logScriptStart(script);
 			
 			// For each target in the script, start execution thread
 			executionThreads = new Vector<ExecutionThread>();			
-			for (final Target target : script.getTargets(PoseidonServer.serverId)) {			
+			for (final Target target : ControlDataStore.getScriptTargets(script,PoseidonServer.serverId)) {			
 				final ExecutionThread thread = new ExecutionThread(script,target);
-				thread.setScriptTargetLogId(ControlDataStore.logScriptTargetStart(scriptLogId,target));
+				thread.setScriptTargetLog(ControlDataStore.logScriptTargetStart(scriptLog,target));
 				executionThreads.add(thread);
 				thread.start();	
 			}
@@ -85,14 +90,14 @@ public class PoseidonJob implements Job {
 			// probably hanging on the system network call. So we just leave them running
 			if ((jobEndTime-jobStartTime) > maxThreadRunTimeSec * 1000) {
 				
-				ControlDataStore.logScriptTimeout(script,scriptLogId);
+				ControlDataStore.logScriptTimeout(script,scriptLog);
 				
 				// Update status for all threads that finished, so that we can
 				// see in UI which targets are hanging				
 				for (final ExecutionThread thread : executionThreads) {									
 					if (!thread.isRunning()) {
 						thread.process(expressionParser);
-						ControlDataStore.logScriptTargetEnd(thread);
+						ControlDataStore.logScriptTargetEnd(thread.getScriptTargetLog(), thread.getExecutionResult());
 					}
 				}
 				return;
@@ -105,10 +110,10 @@ public class PoseidonJob implements Job {
 			// Process each result 
 			for (final ExecutionThread thread : executionThreads) {						
 				thread.process(expressionParser);
-				ControlDataStore.logScriptTargetEnd(thread);
+				ControlDataStore.logScriptTargetEnd(thread.getScriptTargetLog(), thread.getExecutionResult());
 			}
 			
-			ControlDataStore.logScriptEnd(script,scriptLogId);
+			ControlDataStore.logScriptEnd(script,scriptLog);
 			
 		} catch (Exception e) {
 			// We are only allowed to throw JobExecutionException, 

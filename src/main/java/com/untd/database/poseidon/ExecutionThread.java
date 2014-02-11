@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.untd.database.poseidon.data.Script;
+import com.untd.database.poseidon.data.ScriptTargetLog;
+import com.untd.database.poseidon.data.Target;
+
 
 /**
  * This is the actual worker thread that executes particular script on the target. 
@@ -20,7 +24,7 @@ public class ExecutionThread extends Thread {
 	private Target target;
 	private volatile boolean running;
 	private volatile ExecutionResult executionResult;
-	private int scriptTargetLogId;
+	private ScriptTargetLog scriptTargetLog;
 	private Executor executor;
 	private Logger logger;
 	
@@ -56,8 +60,8 @@ public class ExecutionThread extends Thread {
 		try {
 			conn = DriverManager.getConnection(
 					target.getUrl(),
-					target.getMonitor_username(),
-					target.getMonitor_password());
+					target.getMonitorUsername(),
+					target.getDecryptedPassword());
 			
 			conn.setAutoCommit(true);
 			
@@ -105,16 +109,16 @@ public class ExecutionThread extends Thread {
 	 * Return script target log id
 	 * @return Returns the scriptTargetLogId.
 	 */
-	public int getScriptTargetLogId() {
-		return scriptTargetLogId;
+	public ScriptTargetLog getScriptTargetLog() {
+		return scriptTargetLog;
 	}
 
 	/**
 	 * Set script target log id
 	 * @param scriptTargetLogId The scriptTargetLogId to set.
 	 */
-	public void setScriptTargetLogId(int scriptTargetLogId) {
-		this.scriptTargetLogId = scriptTargetLogId;
+	public void setScriptTargetLog(ScriptTargetLog scriptTargetLog) {
+		this.scriptTargetLog = scriptTargetLog;
 	}
 	
 
@@ -145,7 +149,7 @@ public class ExecutionThread extends Thread {
 				try {
 					
 					// Evaluate expression for this row
-					expressionValue = evaluateExpression(executionResult,row,script.getExpression_text(),expressionParser);
+					expressionValue = evaluateExpression(executionResult,row,script.getExpressionText(),expressionParser);
 					
 					if (expressionValue > 0.0) {
 						
@@ -247,15 +251,15 @@ public class ExecutionThread extends Thread {
 		
 		String severityColValue;
 		
-		if (script.isFixedSeverity()) {
-			return script.getFixed_severity();
+		if (script.getFixedSeverity() != Script.SEVERITY_CALCULATE) {
+			return script.getFixedSeverity().shortValue();
 		}
 		
 		if (row.getColumns().size() > script.getSeverity_column_position()) {
 			severityColValue = row.getColumns().elementAt(script.getSeverity_column_position());
 			return script.calculateSeverity(severityColValue);
 		} else {
-			return 0;
+			return Script.SEVERITY_LOW;
 		}		
 	 
 	}
@@ -274,7 +278,7 @@ public class ExecutionThread extends Thread {
 		ArrayList<String> emailAddresses = new ArrayList<String>();
 		
 		// Get a list of email addresses and send alert
-		for (final Notification notification : script.getNotificationList(severity)) {		
+		for (final Notification notification : ControlDataStore.getScriptNotifications(script, severity)) {		
 			emailAddresses.add(notification.getEmailAddress());
 			
 		}

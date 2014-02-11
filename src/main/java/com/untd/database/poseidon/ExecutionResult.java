@@ -2,6 +2,8 @@ package com.untd.database.poseidon;
 
 import java.util.Vector;
 
+import com.untd.database.poseidon.data.Target;
+
 /**
  * Class to store various states of script execution result.
  * After each execution, script can have several types of results,

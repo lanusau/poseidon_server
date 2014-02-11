@@ -3,6 +3,8 @@ package com.untd.database.poseidon;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import com.untd.database.poseidon.data.Script;
+
 
 /**
  * Abstract class inherited by classes that execute scripts in the databases
