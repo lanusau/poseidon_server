@@ -7,6 +7,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.LoggerFactory;
 
 import com.untd.database.poseidon.data.Script;
 import com.untd.database.poseidon.data.ScriptLog;
@@ -117,8 +118,10 @@ public class PoseidonJob implements Job {
 			
 		} catch (Exception e) {
 			// We are only allowed to throw JobExecutionException, 
-			// so we have to wrap everything in try block and catch everything			
-			exception_Blanket = new JobExecutionException("Script "+scriptId+" execution failed:"+e.getMessage());
+			// so we have to wrap everything in try block and catch everything	
+			String msg = "Script "+scriptId+" execution failed:"+e.getMessage();
+			LoggerFactory.getLogger(PoseidonJob.class).warn(msg);
+			exception_Blanket = new JobExecutionException(msg);
 			throw exception_Blanket;
 		}
 		

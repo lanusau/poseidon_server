@@ -26,7 +26,7 @@
     insert into psd_script_target_row_log(script_target_log_id, row_number,
       expression_result, expression_error_message, severity, create_sysdate, update_sysdate)
     values (#{scriptTargetLogId,jdbcType=INTEGER},#{rowNumber},
-      #{expressionResult},#{expressionErrorMessage},#{severity}now(),now())                             
+      #{expressionResult},#{expressionErrorMessage},#{severity},now(),now())                             
   </insert>
   <insert id="insertColumn" parameterType="com.untd.database.poseidon.data.ScriptTargetColLog">                         
     insert into psd_script_target_col_log(

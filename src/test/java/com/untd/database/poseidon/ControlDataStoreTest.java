@@ -44,26 +44,50 @@ public class ControlDataStoreTest {
 		ScriptLog scriptLog = ControlDataStore.logScriptStart(script);
 		assertNotNull(scriptLog.getScriptLogId());
 		
-		Target target = targets.get(0);
-		ScriptTargetLog scriptTargetLog = ControlDataStore.logScriptTargetStart(scriptLog, target);
-				
-		ControlDataStore.logScriptEnd(script, scriptLog);
-		
-		ExecutionThread thread = new ExecutionThread(script,target);	
-		ControlDataStore.logScriptTargetEnd(scriptTargetLog,thread.getExecutionResult());
-		
-		// Check that values logged into the database are correct
+		// Check actual values in log tables
 		String sql = "select count(*) from psd_script_log "
-				+ "where script_log_id = ? "
-				+ "and status_number = ? ";
+						+ "where script_log_id = ? "
+						+ "and status_number = ? ";
 		PreparedStatement st = TestSetup.connection.prepareStatement(sql);
 		st.setInt(1, scriptLog.getScriptLogId());
-		st.setInt(2, ExecutionResult.RESULT_FINISHED);
+		st.setInt(2, ExecutionResult.RESULT_NOT_FINISHED);
 		ResultSet rs = st.executeQuery();
 		rs.next();
 		int count = rs.getInt(1);
 		assertTrue(count > 0);
 		
+		Target target = targets.get(0);
+		ScriptTargetLog scriptTargetLog = ControlDataStore.logScriptTargetStart(scriptLog, target);
+				
+		ControlDataStore.logScriptEnd(script, scriptLog);
+		
+		// Check actual values in log tables
+		sql = "select count(*) from psd_script_log "
+				+ "where script_log_id = ? "
+				+ "and status_number = ? ";
+		st = TestSetup.connection.prepareStatement(sql);
+		st.setInt(1, scriptLog.getScriptLogId());
+		st.setInt(2, ExecutionResult.RESULT_FINISHED);
+		rs = st.executeQuery();
+		rs.next();
+		count = rs.getInt(1);
+		assertTrue(count > 0);
+		
+		ExecutionThread thread = new ExecutionThread(script,target);
+		ExecutionResult result = new ExecutionResult();
+		
+		// Build fake result set
+		sql = "select * from psd_script";
+		st = TestSetup.connection.prepareStatement(sql);
+		rs = st.executeQuery();
+		rs.next();
+		ExecutionResultRow resultRow = new ExecutionResultRow(rs);
+		result.add(resultRow);
+		thread.setExecutionResult(result);
+		
+		ControlDataStore.logScriptTargetEnd(scriptTargetLog,thread.getExecutionResult());
+		
+		// Check actual values in log tables
 		sql = "select count(*) from psd_script_target_log "
 				+ "where script_target_log_id = ? "
 				+ "and status_number = ? ";
@@ -74,6 +98,16 @@ public class ControlDataStoreTest {
 		rs.next();
 		count = rs.getInt(1);
 		assertTrue(count > 0);		
+		
+		sql = "select count(*) from psd_script_target_row_log "
+				+ "where script_target_log_id = ?";
+		st = TestSetup.connection.prepareStatement(sql);
+		st.setInt(1, scriptTargetLog.getScriptTargetLogId());
+		rs = st.executeQuery();
+		rs.next();
+		count = rs.getInt(1);
+		assertTrue(count > 0);	
+				
 		
 		// Test script miss fire log
 		ControlDataStore.logScriptMissfire(script);

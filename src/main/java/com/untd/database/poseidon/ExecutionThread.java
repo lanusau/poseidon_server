@@ -104,6 +104,14 @@ public class ExecutionThread extends Thread {
 	public ExecutionResult getExecutionResult() {
 		return executionResult;
 	}
+	
+	/**
+	 * Setter for executionResult	 
+	 * @param executionResult Execution Result object
+	 */
+	public void setExecutionResult(ExecutionResult executionResult) {
+		this.executionResult = executionResult;
+	}
 
 	/**
 	 * Return script target log id
