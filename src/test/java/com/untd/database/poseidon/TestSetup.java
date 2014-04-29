@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 
 
@@ -14,6 +15,7 @@ public class TestSetup {
 	
 	public static Connection connection;
 	public static int script_id;
+	public static int plsq_script_id;
 	public static int target_id;
 	public static int server_id;
 	
@@ -22,6 +24,8 @@ public class TestSetup {
 		// Initialize configuration
 		PoseidonConfiguration.init();
 		PoseidonConfiguration.addPropertyFile("poseidon-test.conf");		
+		
+		ControlDataStore.init(ConfigurationConverter.getProperties(PoseidonConfiguration.getConfiguration()));
 		
 		// Connect to the test database
 		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
@@ -39,6 +43,17 @@ public class TestSetup {
 			script_id = rs.getInt(1);
 		} else {
 			script_id = 0;
+		}
+		
+		// Find test for PLSQL by name
+		
+		sql = "select script_id from psd_script where name = 'PLSQL Test'";
+		st = connection.prepareCall(sql);
+		rs = st.executeQuery();
+		if (rs.next()) {
+			plsq_script_id = rs.getInt(1);
+		} else {
+			plsq_script_id = 0;
 		}
 		
 		// Get test target ID by name. Also get server ID

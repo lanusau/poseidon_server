@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
@@ -24,16 +23,14 @@ public class ControlDataStoreTest {
 	public void testControlStore() throws ConfigurationException, SQLException, IOException {
 		TestSetup.setup();	
 		
-		ControlDataStore.init(ConfigurationConverter.getProperties(PoseidonConfiguration.getConfiguration()));
-		
 		Script script = ControlDataStore.getScript(TestSetup.script_id);
 		assertNotNull(script);
 
-		// There should be 3 active and 1 inactive scripts
+		// There should be 3 active and 2 inactive scripts
 		List<Script> scriptList = ControlDataStore.getActiveScriptList(TestSetup.server_id);
 		assertEquals(3,scriptList.size());
 		scriptList = ControlDataStore.getInactiveScriptList(TestSetup.server_id);
-		assertEquals(1,scriptList.size());
+		assertEquals(2,scriptList.size());
 		
 		// There should be 1 target assigned to the script
 		List<Target> targets = ControlDataStore.getScriptTargets(script,PoseidonConfiguration.getConfiguration().getInt("serverId"));

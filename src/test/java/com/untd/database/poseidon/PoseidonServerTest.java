@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -100,7 +101,7 @@ public class PoseidonServerTest {
 		// Set the schedule for all scripts (except the one we will test) to be
 		// way in the future			
 		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.DAY_OF_MONTH, 30);
+		calendar.add(Calendar.HOUR_OF_DAY, 12);
 				
 		String sql = "update psd_script set " 
 				+ "schedule_min = ? ,"
@@ -149,8 +150,20 @@ public class PoseidonServerTest {
 		PoseidonServer.disable();
 		
 		// Give a server some time to shut down
-		Thread.sleep(PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepMs")*3);
+		logger.debug("Waiting for server to shutdown for "+PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepMs")*6+" ms");
+		Thread.sleep(PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepMs")*6);
 		
+		if (poseidonServerThread.isAlive()) {
+			logger.debug("Server is still alive");
+			Map<Thread,StackTraceElement[]> map = Thread.getAllStackTraces();
+			for (Thread t : map.keySet()) {
+				System.err.println("Thread:"+t.getName());
+				for (StackTraceElement e : map.get(t)) {
+					System.err.println(e.getClassName()+"."+e.getMethodName()+":"+e.getLineNumber());
+				}
+				System.err.println("\n");
+			}
+		}
 		// Thread now should be dead
 		assertFalse(poseidonServerThread.isAlive());
 		

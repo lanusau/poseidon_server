@@ -829,7 +829,13 @@ public class Script {
      * @mbggenerated Fri Jan 31 09:44:39 GMT-08:00 2014
      */
     public String getQueryText() {
-        return emptyStringIfNull(queryText);
+    	// Need to replace all CR characters
+    	if (queryText != null) {
+    		queryText = queryText.replace((char)13, (char)10);    		
+    	} else {
+    		queryText = "";
+    	}    		
+        return queryText;
     }
 
     /**
