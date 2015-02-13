@@ -62,8 +62,8 @@ public class PoseidonServer {
 		}
 		try {
 			PoseidonConfiguration.init();
-			PoseidonConfiguration.addPropertyFile("poseidon-default.conf");
 			PoseidonConfiguration.addPropertyFile("poseidon.conf");
+			PoseidonConfiguration.addPropertyFile("poseidon-default.conf");			
 		} catch (ConfigurationException e) {
 			logger.error("Error trying to load properties: " + e.getMessage());
 			System.exit(1);
