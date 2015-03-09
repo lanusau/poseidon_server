@@ -16,7 +16,6 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -30,24 +29,24 @@ import com.untd.database.poseidon.data.Script;
  * 
  */
 public class PoseidonServer {
-	
-	/**
-	 * Server ID, obtained from the property file
-	 */
-	static public int serverId;	
-	
-	static private SchedulerFactory schedFact;
-	static private Scheduler sched;	
-	static private Configuration prop;
-	static private Logger logger;	
-	static private volatile boolean enabled;
-	static private volatile long rescheduleCount;
+		
+	static public int serverId;                   //Server ID, obtained from the property file			
+	static private Scheduler sched;               // Quartz scheduler 	
+	static private Configuration prop;            // Properties
+	static private Logger logger;	              // Logger
+	static private volatile boolean enabled;      // Server enabled flag
+	static private volatile long rescheduleCount; // Script reschedule counter
+	static private CnameChecker cnameChecker;     // CNAME checker instance
 
 	/**
 	 * Main method for the PoseidonServer class.
 	 */
 	public static void main(String[] args) {		
-		init();
+		try {
+			init();
+		} catch (CnameCheckException e) {
+			System.exit(1);
+		}
 		run();
 	}	
 	
@@ -72,8 +71,9 @@ public class PoseidonServer {
 	
 	/**
 	 * Initialize server
+	 * @throws CnameCheckException 
 	 */
-	public static void init() {
+	public static void init() throws CnameCheckException {
 		
 		// Initialize logger	
 		logger = LoggerFactory.getLogger(PoseidonServer.class);
@@ -97,6 +97,12 @@ public class PoseidonServer {
 		serverId = prop.getInt("serverId");		
 											
 		logger.info("Starting server ID:"+serverId);
+		
+		// Setup to monitor CNAME is specified in the configuration
+		String cname = prop.getString("cname");
+		if (cname != null ) {
+			(cnameChecker = new CnameChecker()).setCname(cname);;						
+		}
 						
 		// Initialize Alerter
 		Alerter.init();
@@ -115,9 +121,8 @@ public class PoseidonServer {
 		}
 		
 		// Create and start Quartz scheduler instance
-		try {					
-			schedFact = new StdSchedulerFactory();
-			sched = schedFact.getScheduler();
+		try {								
+			sched = new StdSchedulerFactory().getScheduler();
 			sched.getListenerManager().addTriggerListener(new PoseidonTriggerListener());
 
 			sched.start();	
@@ -137,8 +142,7 @@ public class PoseidonServer {
 	public static void run () {
 		
 		
-		// Loop while enabled flag is set, which pretty much means
-		// until killed, because enabled flag is only reset in testing. 
+		// Loop while enabled flag is set 
 		while(enabled) {
 			try {
 				
@@ -153,9 +157,15 @@ public class PoseidonServer {
 				}
 				
 				// Send heart beat to the server table
-				ControlDataStore.logHeartbeat(serverId);
+				ControlDataStore.logHeartbeat(serverId);								
 				
 				Thread.sleep(prop.getInt("mainThreadSleepMs",5000));
+				
+				// If requested, monitor CNAME to shut down if it no longer points to our host
+				if (cnameChecker != null && !cnameChecker.check()) {					
+					logger.warn("Shutting down because CNAME no loger points to us");
+					enabled = false;
+				}
 																				
 
 			} catch (Exception e) {
@@ -283,6 +293,13 @@ public class PoseidonServer {
 	public static long getRescheduleCount() {
 		return rescheduleCount;
 	}
+
+	/**
+	 * Set CNAME checker (used in testing)
+	 */
+	public static void setCnameChecker(CnameChecker cnameChecker) {
+		PoseidonServer.cnameChecker = cnameChecker;
+	}	
 		
 	
 }

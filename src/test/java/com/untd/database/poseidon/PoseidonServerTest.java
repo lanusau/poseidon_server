@@ -94,9 +94,10 @@ public class PoseidonServerTest {
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 * @throws MessagingException
+	 * @throws CnameCheckException 
 	 */
 	@Test
-	public void testScriptScheduling() throws SQLException, InterruptedException, MessagingException {			
+	public void testScriptScheduling() throws SQLException, InterruptedException, MessagingException, CnameCheckException {			
 		
 		// Set the schedule for all scripts (except the one we will test) to be
 		// way in the future			
@@ -181,9 +182,10 @@ public class PoseidonServerTest {
 	 * Test that script rescheduling works as expected
 	 * @throws InterruptedException
 	 * @throws SQLException
+	 * @throws CnameCheckException 
 	 */
 	@Test
-	public void testScriptReScheduling() throws InterruptedException, SQLException {
+	public void testScriptReScheduling() throws InterruptedException, SQLException, CnameCheckException {
 		
 		// Start Poseidon server in separate thread 
 		PoseidonServer.init();
@@ -216,6 +218,56 @@ public class PoseidonServerTest {
 		
 		PoseidonServer.disable();
 		poseidonServerThread.join();
+	}
+	
+	@Test
+	public void testCnameCheckOnStartup() throws InterruptedException {
+		// Set CNAME parameter
+		PoseidonConfiguration.getConfiguration().setProperty("cname", "www.google.com");
+		
+		// Init should raise an exception
+		try {
+			PoseidonServer.init();
+			fail("Should have raised an Exception");
+		} catch (CnameCheckException e) {
+		} finally {
+			PoseidonConfiguration.getConfiguration().clearProperty("cname");
+			PoseidonServer.setCnameChecker(null);
+		}
+	}
+	
+	@Test
+	public void testCnameShutdown() throws CnameCheckException, InterruptedException {
+		// Create fake CNAME checker and
+		FakeCnameChecker fakeCnameChecker = new FakeCnameChecker();
+		PoseidonServer.init();
+		PoseidonServer.setCnameChecker(fakeCnameChecker);
+		
+		// Run server
+		Thread poseidonServerThread = new Thread( new Runnable() {
+			public void run()  {
+				PoseidonServer.run();
+			}
+		});		
+		poseidonServerThread.setName("PoseidonServer");
+		poseidonServerThread.start();
+		
+		// Wait few cycles
+		Thread.sleep(PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepMs")*3);
+				
+		// Thread should be running
+		assertTrue(poseidonServerThread.isAlive());
+		
+		// Simulate CNAME change
+		fakeCnameChecker.setMatch(false);
+		
+		// Wait few cycles
+		Thread.sleep(PoseidonConfiguration.getConfiguration().getInt("mainThreadSleepMs")*3);
+		
+		// Thread should have exited
+		assertFalse(poseidonServerThread.isAlive());
+		
+		PoseidonServer.setCnameChecker(null);
 	}
 	
 	/**
