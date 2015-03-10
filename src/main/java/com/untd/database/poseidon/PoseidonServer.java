@@ -45,6 +45,7 @@ public class PoseidonServer {
 		try {
 			init();
 		} catch (CnameCheckException e) {
+			logger.error(e.getMessage());
 			System.exit(1);
 		}
 		run();
