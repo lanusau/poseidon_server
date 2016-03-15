@@ -1,5 +1,7 @@
 package com.untd.database.poseidon;
 
+import com.untd.database.poseidon.util.CnameChecker;
+
 /**
  * Fake CNAME checker used in testing
  *

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.icegreen.greenmail.util.GreenMail;
 import com.untd.database.poseidon.data.Script;
 import com.untd.database.poseidon.data.Target;
+import com.untd.database.poseidon.exception.CnameCheckException;
 
 public class PoseidonServerTest {
 	

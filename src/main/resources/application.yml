@@ -1,0 +1,16 @@
+serverId: 3
+decryptionSecret: m0nitr$this
+datasource:
+  url: jdbc:mysql://dbutil01dev.vgs.dev.int.untd.com/poseidon
+  username: root
+  password: empala64
+  driverClassName: com.mysql.jdbc.Driver
+logging:
+  path: log
+mail:
+  host: outbound-relay
+  fromEmailAddress: monitoring-database@corp.untd.com
+---
+spring:
+  profiles: cnameCheck
+cname: blah

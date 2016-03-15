@@ -12,6 +12,9 @@ import org.junit.Test;
 import com.icegreen.greenmail.util.GreenMail;
 import com.untd.database.poseidon.data.Script;
 import com.untd.database.poseidon.data.Target;
+import com.untd.database.poseidon.model.AlertMessage;
+import com.untd.database.poseidon.model.ExecutionResult;
+import com.untd.database.poseidon.util.Alerter;
 
 public class AlerterTest {
 
