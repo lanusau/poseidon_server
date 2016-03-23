@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -23,9 +22,6 @@ import com.untd.database.poseidon.dao.TargetDao;
 @EnableConfigurationProperties
 @EnableTransactionManagement
 public class DataSourceConfiguration {
-	
-	@Value("${serverId}")
-	private int serverId;
 	
 	@Bean
 	@ConfigurationProperties(prefix="datasource")
@@ -64,7 +60,6 @@ public class DataSourceConfiguration {
 	public ScriptLogDao scriptLogDao() {
 		ScriptLogDao bean = new ScriptLogDao();
 		bean.setSessionFactory(sessionFactory().getObject());
-		bean.setServerId(serverId);
 		return bean;
 	}
 	

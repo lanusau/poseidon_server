@@ -7,7 +7,7 @@
     <column>update_sysdate</column>
     <row>
       <value>234173643</value>
-      <value>Ops-DB</value>
+      <value>Developer</value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
     </row>
@@ -29,7 +29,7 @@
       <value>179776598</value>
       <value>234173643</value>
       <value>3</value>
-      <value>ops_db@noc.com</value>
+      <value>developer@noc.com</value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
     </row>
@@ -37,7 +37,7 @@
       <value>390279266</value>
       <value>234173643</value>
       <value>1</value>
-      <value>ops_db_pagers@noc.com</value>
+      <value>developer_pager@noc.com</value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
     </row>
@@ -45,7 +45,7 @@
       <value>470756110</value>
       <value>234173643</value>
       <value>2</value>
-      <value>ops_db@noc.com</value>
+      <value>developer@noc.com</value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
     </row>
@@ -61,7 +61,7 @@
       <value>1009951584</value>
       <value>501342728</value>
       <value>1</value>
-      <value>dba_pagers@noc.com</value>
+      <value>dba_pager@noc.com</value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
     </row>
@@ -96,78 +96,6 @@
       <value>destination</value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
-    </row>
-  </table>
-  <table name="psd_schema_migrations">
-    <column>version</column>
-    <row>
-      <value>20120712213956</value>
-    </row>
-    <row>
-      <value>20120717225613</value>
-    </row>
-    <row>
-      <value>20120730165426</value>
-    </row>
-    <row>
-      <value>20120731193356</value>
-    </row>
-    <row>
-      <value>20120731201047</value>
-    </row>
-    <row>
-      <value>20120731201116</value>
-    </row>
-    <row>
-      <value>20120801170240</value>
-    </row>
-    <row>
-      <value>20120801170327</value>
-    </row>
-    <row>
-      <value>20120801170459</value>
-    </row>
-    <row>
-      <value>20120801170510</value>
-    </row>
-    <row>
-      <value>20120806224639</value>
-    </row>
-    <row>
-      <value>20120807194053</value>
-    </row>
-    <row>
-      <value>20120807195427</value>
-    </row>
-    <row>
-      <value>20120807200616</value>
-    </row>
-    <row>
-      <value>20120807203040</value>
-    </row>
-    <row>
-      <value>20120807205008</value>
-    </row>
-    <row>
-      <value>20120807205731</value>
-    </row>
-    <row>
-      <value>20120814181609</value>
-    </row>
-    <row>
-      <value>20120815164316</value>
-    </row>
-    <row>
-      <value>20120815202550</value>
-    </row>
-    <row>
-      <value>20120815212330</value>
-    </row>
-    <row>
-      <value>20120815213526</value>
-    </row>
-    <row>
-      <value>20120917224551</value>
     </row>
   </table>
   <table name="psd_script">
@@ -778,38 +706,6 @@ and ml.max_seq != appl_l.max_applied_seq
       <value>Oracle</value>
       <value>dbi:OCI8:(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%h)(PORT=%p))(CONNECT_DATA=(SERVICE_NAME=%d)))</value>
       <value>jdbc:oracle:thin:@//%h:%p/%d</value>
-      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
-      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
-    </row>
-  </table>
-  <table name="psd_user">
-    <column>user_id</column>
-    <column>login</column>
-    <column>password_digest</column>
-    <column>access_level</column>
-    <column>create_sysdate</column>
-    <column>update_sysdate</column>
-    <row>
-      <value>135138680</value>
-      <value>admin</value>
-      <value>$2a$10$9E0EDdw8uRK7uDfOMvpH9elp5Lc4XUQebiEuN4scsp7X36BvI248G</value>
-      <value>0</value>
-      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
-      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
-    </row>
-    <row>
-      <value>571454927</value>
-      <value>lanusau</value>
-      <value>$2a$10$9E0EDdw8uRK7uDfOMvpH9elp5Lc4XUQebiEuN4scsp7X36BvI248G</value>
-      <value>1</value>
-      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
-      <value><![CDATA[2012-07-12 07:39:56.0]]></value>
-    </row>
-    <row>
-      <value>750230071</value>
-      <value>guest</value>
-      <value>$2a$10$9E0EDdw8uRK7uDfOMvpH9elp5Lc4XUQebiEuN4scsp7X36BvI248G</value>
-      <value>9</value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
       <value><![CDATA[2012-07-12 07:39:56.0]]></value>
     </row>

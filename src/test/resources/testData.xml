@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+	<psd_server 
+		server_id="1" 
+		name="test"
+		location="test"
+		status_code="A"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_target_type
+		target_type_id="1"
+		name="MySQL"
+		url_ruby="dbi:Mysql:database=%d;host=%h;port=%p"
+		url_jdbc="jdbc:mysql://%h:%p/%d"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_target_type
+		target_type_id="2"
+		name="Oracle"
+		url_ruby="dbi:OCI8:(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%h)(PORT=%p))(CONNECT_DATA=(SERVICE_NAME=%d)))"
+		url_jdbc="jdbc:oracle:thin:@//%h:%p/%d"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_target
+		target_id="1"
+		target_type_id="1"
+		server_id="1"
+		name="Test#1" 
+		hostname="test1.com"
+		database_name="test"
+		port_number="3307"
+		monitor_username="test_user"
+		salt="3802852479467620"
+		monitor_password="wFgBkMJ5nkgSJOtVJo1r7g=="
+		status_code="A"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_target
+		target_id="2"
+		target_type_id="2"
+		server_id="1"
+		name="Test#2" 
+		hostname="test2.com"
+		database_name="test"
+		port_number="3307"
+		monitor_username="test_user"
+		salt="3802852479467620"
+		monitor_password="wFgBkMJ5nkgSJOtVJo1r7g=="
+		status_code="A"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_notify_group 
+		notify_group_id="1"
+		name="Test"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_notify_group_email
+		notify_group_email_id="1"
+		notify_group_id="1"
+		severity="1"
+		email_address="test1@test.com"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_notify_group_email
+		notify_group_email_id="2"
+		notify_group_id="1"
+		severity="2"
+		email_address="test2@test.com"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_notify_group_email
+		notify_group_email_id="3"
+		notify_group_id="1"
+		severity="3"
+		email_address="test3@test.com"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_script
+		script_id="1"
+		name="Test1"
+		description="Test1"
+		schedule_min="1"
+		schedule_hour="*"
+		schedule_day="*"
+		schedule_month="*"
+		schedule_week="?"
+		query_type="1"
+		query_text="select 1"
+		timeout_sec="300"
+		fixed_severity="1"
+		expression_text="1==1"
+		message_format="0"
+		message_subject="Test"
+		message_header="Test"
+		message_text_str="Test"
+		message_footer="Test"
+		status_code="A"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_script_notification
+		script_notification_id="1"
+		notify_group_id="1"
+		script_id="1"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+	<psd_script_target
+		script_target_id="1"
+		target_id="1"
+		script_id="1"
+		create_sysdate="2016-07-12 07:39:56"
+		update_sysdate="2016-07-12 07:39:56"
+	/>
+</dataset>

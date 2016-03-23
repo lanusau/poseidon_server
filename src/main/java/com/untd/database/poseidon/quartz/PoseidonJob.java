@@ -20,6 +20,7 @@ import com.untd.database.poseidon.dao.ScriptLogDao;
 import com.untd.database.poseidon.dao.ScriptTargetLogDao;
 import com.untd.database.poseidon.dao.TargetDao;
 import com.untd.database.poseidon.model.ExecutionResult;
+import com.untd.database.poseidon.model.Settings;
 import com.untd.database.poseidon.model.database.Script;
 import com.untd.database.poseidon.model.database.ScriptLog;
 import com.untd.database.poseidon.model.database.Target;
@@ -56,6 +57,9 @@ public class PoseidonJob implements Job {
 	private Alerter alerter;
 	
 	@Autowired
+	private Settings settings;
+	
+	@Autowired
 	ExecutorService executorService;
 	
 	
@@ -67,12 +71,12 @@ public class PoseidonJob implements Job {
 		
 		final List<Callable<ExecutionResult>> taskList = new ArrayList<Callable<ExecutionResult>>();
 		
-		int maxThreadRunTimeSec = 600;
+		int maxThreadRunTimeSec = settings.getMaxThreadRunTimeSec();
 		
 		// Get data passed to the job and extract script ID
 		JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
 		int scriptId = jobData.getInt("scriptId");		
-		int serverId = jobData.getInt("serverId");
+		int serverId = settings.getServerId();
 		
 		try {
 						

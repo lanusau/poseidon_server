@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import com.untd.database.poseidon.dao.ScriptDao;
+import com.untd.database.poseidon.model.Settings;
 import com.untd.database.poseidon.model.database.Script;
 
 /**
@@ -41,8 +42,10 @@ public class ScriptSchedulingTask implements InitializingBean {
 	@Autowired
 	private SchedulerFactoryBean schedulerFactoryBean;
 	
-	private Scheduler scheduler;	
-	private int serverId;
+	@Autowired
+	private Settings settings;
+	
+	private Scheduler scheduler;
 	private int rescheduleCount = 0;
 	private Logger logger;
 
@@ -53,7 +56,7 @@ public class ScriptSchedulingTask implements InitializingBean {
 	public void work() {		
 		try {
 			// Get a list of active scripts and add them to the schedule	
-			List<Script> activeScriptList = scriptDao.getActiveScriptList(serverId); 
+			List<Script> activeScriptList = scriptDao.getActiveScriptList(settings.getServerId()); 
 			Set<String> activeScriptIds = new HashSet<String>();
 			for (final Script script : activeScriptList) {
 				activeScriptIds.add(script.getScriptIdStr());
@@ -140,7 +143,6 @@ public class ScriptSchedulingTask implements InitializingBean {
 		JobDetail jobDetail = newJob(PoseidonJob.class)
 				.withIdentity(script.getScriptIdStr())
 				.usingJobData("scriptId", script.getScriptId())
-				.usingJobData("serverId", serverId)
 				.usingJobData("update_sysdate", script.getUpdateSysdate().getTime())
 				.storeDurably()
 				.build();
@@ -175,20 +177,6 @@ public class ScriptSchedulingTask implements InitializingBean {
 		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());			
 		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 		DriverManager.registerDriver(new org.postgresql.Driver());
-	}
-
-	/**
-	 * @return the serverId
-	 */
-	public int getServerId() {
-		return serverId;
-	}
-
-	/**
-	 * @param serverId the serverId to set
-	 */
-	public void setServerId(int serverId) {
-		this.serverId = serverId;
 	}
 
 	/**

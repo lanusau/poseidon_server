@@ -8,12 +8,15 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.untd.database.poseidon.model.Settings;
 import com.untd.database.poseidon.model.database.Target;
 
 public class PasswordDecryptor {
 	
-	private String decryptionSecret;
+	@Autowired
+	private Settings settings;
 	
 	/**
      * Get decrypted password
@@ -26,7 +29,7 @@ public class PasswordDecryptor {
 		// Try to decrypt the password
 		try {
 			final MessageDigest md = MessageDigest.getInstance("MD5");
-			final byte[] key = md.digest(decryptionSecret.getBytes("UTF-8"));
+			final byte[] key = md.digest(settings.getDecryptionSecret().getBytes("UTF-8"));
 			final SecretKeySpec skeySpec = new SecretKeySpec(key, "AES");
 			final byte[] iv = md.digest(target.getSalt().getBytes("UTF-8"));
 
@@ -42,13 +45,5 @@ public class PasswordDecryptor {
 		}
 		return decryptedPassword;
     }
-
-	public String getDecryptionSecret() {
-		return decryptionSecret;
-	}
-
-	public void setDecryptionSecret(String decryptionSecret) {
-		this.decryptionSecret = decryptionSecret;
-	}
 
 }

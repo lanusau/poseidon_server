@@ -1,11 +1,12 @@
 package com.untd.database.poseidon.config;
 
-import org.nfunk.jep.JEP;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import com.untd.database.poseidon.model.Settings;
 import com.untd.database.poseidon.util.Alerter;
 import com.untd.database.poseidon.util.PasswordDecryptor;
 
@@ -13,27 +14,24 @@ import com.untd.database.poseidon.util.PasswordDecryptor;
 public class PoseidonConfiguration {
 	
 	@Bean
-	@ConfigurationProperties
+	@ConfigurationProperties(prefix="poseidon")
+	public Settings settings() {
+		return new Settings();
+	}
+	
+	@Bean	
 	public PasswordDecryptor passwordDecryptor() {
 		return new PasswordDecryptor();
 	}
 	
 	@Bean
-	public JEP expressionParser() {
-		JEP brean = new org.nfunk.jep.JEP();
-		brean.addStandardFunctions();
-		brean.addStandardConstants();	
-		return brean;
-	}
-	
-	@Bean
-	@ConfigurationProperties(prefix="mail")
+	@ConfigurationProperties(prefix="mailer")
 	public JavaMailSender javaMailSender() {
 		return new JavaMailSenderImpl();
 	}
 	
 	@Bean
-	@ConfigurationProperties(prefix="mail")
+	@ConfigurationProperties(prefix="alerter")
 	public Alerter alerter() {
 		return new Alerter();
 	}

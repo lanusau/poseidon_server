@@ -1,5 +1,6 @@
 package com.untd.database.poseidon.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,7 +44,7 @@ public class ExecutionResult {
 	 */
 	public static short RESULT_TIMEDOUT = 6;
 	
-	private List<ExecutionResultRow> rows;
+	private List<ExecutionResultRow> rows =  new ArrayList<ExecutionResultRow>();
 	private short resultCode;
 	private Severity severity;
 	private String resultErrorMsg;

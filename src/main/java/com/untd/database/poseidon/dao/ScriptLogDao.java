@@ -2,16 +2,19 @@ package com.untd.database.poseidon.dao;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.untd.database.poseidon.model.ExecutionResult;
+import com.untd.database.poseidon.model.Settings;
 import com.untd.database.poseidon.model.database.Script;
 import com.untd.database.poseidon.model.database.ScriptLog;
 
 @Transactional
 public class ScriptLogDao extends HibernateDao<ScriptLog,Integer>{
 	
-	private int serverId;
+	@Autowired
+	private Settings settings;
 
 	public ScriptLogDao() {
 		super(ScriptLog.class);
@@ -26,7 +29,7 @@ public class ScriptLogDao extends HibernateDao<ScriptLog,Integer>{
 		
 		ScriptLog scriptLog = new ScriptLog();
 		scriptLog.setScriptId(script.getScriptId());
-		scriptLog.setServerId(serverId);
+		scriptLog.setServerId(settings.getServerId());
 		scriptLog.setStatusNumber(new Integer(ExecutionResult.RESULT_NOT_FINISHED));
 		scriptLog.setStartDate(new Date());
 		scriptLog.setErrorStatusCode(0);
@@ -76,7 +79,7 @@ public class ScriptLogDao extends HibernateDao<ScriptLog,Integer>{
 	public void logScriptMissfire(Script script)  {	
 		ScriptLog scriptLog = new ScriptLog();
 		scriptLog.setScriptId(script.getScriptId());
-		scriptLog.setServerId(serverId);
+		scriptLog.setServerId(settings.getServerId());
 		scriptLog.setStatusNumber(new Integer(ExecutionResult.RESULT_MISSFIRED));
 		scriptLog.setStartDate(new Date());
 		scriptLog.setErrorStatusCode(1);
@@ -86,13 +89,5 @@ public class ScriptLogDao extends HibernateDao<ScriptLog,Integer>{
 		
 		save(scriptLog);
 	}	
-
-	public int getServerId() {
-		return serverId;
-	}
-
-	public void setServerId(int serverId) {
-		this.serverId = serverId;
-	}
 
 }

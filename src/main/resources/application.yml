@@ -1,5 +1,15 @@
-serverId: 3
-decryptionSecret: m0nitr$this
+spring:
+  profiles:
+    active: dev
+---
+### DEVELOPMENT ###
+spring:
+  profiles: dev   
+poseidon:
+  serverId: 3
+  decryptionSecret: m0nitr$this
+  maxThreadRunTimeSec: 600
+  queryThreads: 4
 datasource:
   url: jdbc:mysql://dbutil01dev.vgs.dev.int.untd.com/poseidon
   username: root
@@ -7,9 +17,50 @@ datasource:
   driverClassName: com.mysql.jdbc.Driver
 logging:
   path: log
-mail:
-  host: outbound-relay
+mailer:
+  host: outbound-relay.vgs.int.untd.com
+alerter:
   fromEmailAddress: monitoring-database@corp.untd.com
+org:
+  quartz:
+    scheduler:
+      instanceName: PoseidonScheduler
+    threadPool:
+      class: org.quartz.simpl.SimpleThreadPool
+      threadCount: 2
+    jobStore:
+      misfireThreshold: 60000
+      class: org.quartz.simpl.RAMJobStore
+---
+### TEST ###
+spring:
+  profiles: test
+poseidon:
+  serverId: 222825351
+  decryptionSecret: m0nitr$this
+  maxThreadRunTimeSec: 600
+  queryThreads: 1
+datasource:
+  url: jdbc:mysql://dbutil01dev.vgs.dev.int.untd.com/poseidon3_test
+  username: root
+  password: empala64
+  driverClassName: com.mysql.jdbc.Driver
+logging:
+  path: log
+mailer:
+  host: outbound-relay.vgs.int.untd.com
+alerter:
+  fromEmailAddress: monitoring-database@corp.untd.com
+org:
+  quartz:
+    scheduler:
+      instanceName: PoseidonScheduler
+    threadPool:
+      class: org.quartz.simpl.SimpleThreadPool
+      threadCount: 1
+    jobStore:
+      misfireThreshold: 60000
+      class: org.quartz.simpl.RAMJobStore    
 ---
 spring:
   profiles: cnameCheck

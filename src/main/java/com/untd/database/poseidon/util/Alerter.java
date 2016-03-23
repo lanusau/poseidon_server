@@ -39,6 +39,7 @@ public class Alerter {
 		MimeMessage message = sender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 		try {
+			helper.setFrom(fromEmailAddress);
 			helper.setTo(emailAddresses.toArray(new String[emailAddresses.size()]));
 			helper.setSubject(alertMessage.getMessageSubject());
 
